@@ -1,7 +1,9 @@
 from queue import Queue
 import tkinter as tk
+from PIL import Image, ImageTk
 import numpy as np
 import datetime as date
+
 from .expressions import expressions
 
 class TkinterFace:
@@ -13,16 +15,14 @@ class TkinterFace:
     self.is_asleep = False
 
     # # Canvas for drawing face
-    # self.frame = tk.Frame(self.root, bg="black")
-    # self.frame.pack(fill=tk.X, padx=0, pady=0, side=tk.TOP)
     self.graphic_canvas = tk.Canvas(self.root, height=200, bg='black', bd=0, highlightthickness=0, cursor='none')
     self.graphic_canvas.pack(fill=tk.BOTH, padx=0, pady=0, side=tk.TOP)
 
     # Face Parameters
     self.face_parameters = {
       "look_target": {
-        "current_value": np.array([100.0, 50.0, 1000.0]),
-        "target_value": np.array([100.0, 50.0, 1000.0]),
+        "current_value": np.array([100.0, 75.0, 1000.0]),
+        "target_value": np.array([100.0, 75.0, 1000.0]),
         "max_speed": 20,
         "min_speed": 1,
         "speed_factor": 1.0
@@ -58,8 +58,8 @@ class TkinterFace:
         "speed_factor": 1.0,
       },
       "face_position": {
-        "current_value": np.array([100.0, 50.0, 0]),
-        "target_value": np.array([100.0, 50.0, 0]),
+        "current_value": np.array([100.0, 75.0, 0]),
+        "target_value": np.array([100.0, 75.0, 0]),
         "max_speed": 20,
         "min_speed": 1,
         "speed_factor": 1.0,
@@ -123,8 +123,7 @@ class TkinterFace:
   def update_mouth(self):
     # Update mouth open factor from queue
     if self.is_enabled and not self.talking_queue.empty():
-      self.target_mouth_open_factor = self.talking_queue.get()
-      self.face_parameters["mouth_open_factor"]["target_value"] = self.target_mouth_open_factor
+      self.face_parameters["mouth_open_factor"]["target_value"] = self.talking_queue.get()
     
     self.root.after(50, self.update_mouth)
 
@@ -162,23 +161,6 @@ class TkinterFace:
         self.is_enabled = True
       self.current_expression = None
       self.is_active = False
-
-    # We are asleep, do sleeping things
-    if self.is_asleep:
-      # if drift direction is zero or the face is at edge of the screen, set a random direction
-      if np.linalg.norm(self.sleep_drift_direction) == 0 or \
-        not (
-          (self.face_parameters["face_position"]["current_value"][:2] >= np.array([20, 10])) &
-          (self.face_parameters["face_position"]["current_value"][:2] <= np.array([760, 370]))
-        ).all():
-        self.sleep_drift_direction = np.random.rand(3) * 2 - 1
-        self.sleep_drift_direction[2] = 0
-        self.sleep_drift_direction = self.sleep_drift_direction / np.linalg.norm(self.sleep_drift_direction)
-      
-      # Drift the face position
-      self.face_parameters["face_position"]["target_value"] += self.sleep_drift_direction * 0.5
-      self.face_parameters["face_position"]["target_value"][2] = 0
-      self.face_parameters["look_target"]["target_value"] = self.face_parameters["face_position"]["current_value"] + np.array([0, 0, 1000])
 
     # Update face parameters that can be customized
     for parameter_name in self.face_parameters:
@@ -264,11 +246,11 @@ class TkinterFace:
     # Calculate mouth position based on face position and mouth offset
     mouth_offset_pos = np.array([0, 75.0]) * self.face_parameters["face_scale"]["current_value"]
     mouth_center = np.array([0, 0])
-    mouth_length = 100.0 * self.face_parameters["face_scale"]["current_value"]
+    mouth_length = (50.0 + 50.0 * (1.0 - self.face_parameters["mouth_open_factor"]["current_value"])) * self.face_parameters["face_scale"]["current_value"]
     mouth_start = self.face_parameters["face_position"]["current_value"][:2] + mouth_offset_pos + mouth_center - np.array([mouth_length / 2, 0])
 
     def slope_mouth(x, value):
-      return np.exp(-pow((x - (mouth_resolution / 2.0)) / (mouth_length / 8.0), 2.0)) * value
+      return np.exp(-pow((x - (mouth_resolution / 2.0)) / (mouth_length / (3.0 - self.face_parameters["mouth_open_factor"]["current_value"])), 2.0)) * value
 
     # Generate mouth line coordinates for canvas based on points on the sine wave
     mouth_line = ()
@@ -280,6 +262,7 @@ class TkinterFace:
 
     # Draw Face
     if self.graphic_canvas.find_all() == ():
+      self.graphic_canvas.create_polygon(50,30, 150,30, 170,50, 175,120, 150,170, 120,190, 80,190, 50,170, 25,120, 30,50, outline='#003300', fill='#004400', stipple='gray75', smooth=True, width=2)
       self.eyes[0] = self.graphic_canvas.create_rectangle(eye_ovals[0], outline='green', width=4)
       self.eyes[1] = self.graphic_canvas.create_rectangle(eye_ovals[1], outline='green', width=4)
       self.pupils[0] = self.graphic_canvas.create_rectangle(pupil_ovals[0], outline='#008800', width=1, fill='#008800')

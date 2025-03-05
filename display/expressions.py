@@ -170,10 +170,6 @@ expressions = {
           "enabled": True,
           "frequency_range": [100, 1000]
         },
-        "face_scale": {
-          "target_value": 0.2,
-          "speed_factor": 0.1
-        },
       },
       1.0
     )
