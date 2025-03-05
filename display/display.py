@@ -26,6 +26,8 @@ class Display(Object, Movement):
     root.title("Face")
     root.geometry("200x200+100+100")
 
+    root.update_idletasks()
+
     super().__init__(root)
 
     self.is_active = True
@@ -43,8 +45,10 @@ class Display(Object, Movement):
 
   def start(self):
     # Start the Tkinter main loop
-    self.root.bind_all("<Control-c>", lambda e: self.stop())
-    self.root.mainloop()
+    try:
+      self.root.mainloop()
+    except:
+      self.stop()
     
   def update(self):
     super().update() if hasattr(super(), 'update') else None

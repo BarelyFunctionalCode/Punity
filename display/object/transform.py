@@ -3,7 +3,7 @@ from ..utils import Vector2
 class Transform:
   def __init__(self, object):
     self.object = object
-    self._last_position = Vector2.zero
+    self._last_position = Vector2(self.position)
 
   @property
   def position(self):

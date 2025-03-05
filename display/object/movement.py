@@ -55,12 +55,11 @@ class Movement:
   
 
   def sleep_drift(self, transform):
-    last_movement = transform.position - transform.last_position
-    current_direction = last_movement
-    if not last_movement == Vector2.zero:
-      current_direction = last_movement.normalized
-    else:
-      # Randomly select a direction to drift in
+    # Determine if it is already moving and what direction
+    current_direction = (transform.position - transform.last_position).normalized
+
+    # Randomly select a direction to drift in
+    if current_direction == Vector2.zero:
       current_direction = Vector2.random()
 
     return (current_direction * self.asleep_move_speed).astype(Vector2.int)

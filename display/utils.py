@@ -25,6 +25,8 @@ class Vector2:
   
   @property
   def normalized(self):
+    if self.magnitude == 0:
+      return Vector2.zero
     return Vector2(self._vec / self.magnitude)
   
   # Class methods
@@ -53,7 +55,7 @@ class Vector2:
     return self == other
   
   def normalize(self):
-    self._vec /= self.magnitude
+    self._vec = self.normalized._vec
 
   def astype(self, dtype):
     return Vector2(self._vec.astype(dtype))

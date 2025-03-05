@@ -9,6 +9,7 @@ class Object:
     self._update()
     
   def _update(self):
+    if self.root == None: return
     self.update()
     self.root.after(10, self._update)
 
