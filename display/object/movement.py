@@ -1,20 +1,19 @@
 import numpy as np
 import math
 
-from .environment import Instance as environment
+from ..environment import Instance as environment
 
 def away_from_zero(x):
   return int(x // 1 + 2 ** (x > 0) - 1)
 
 class Movement:
   def __init__(self):
-    super(Movement, self).__init__()
+    super().__init__()
     self.proxity_limit = 300
     self.normal_move_speed = 100
     self.asleep_move_speed = 2
 
     self.move_mode = ''
-
 
   def set_move_mode(self, mode):
     print(f'Set move mode to {mode}')
@@ -30,7 +29,13 @@ class Movement:
 
     return new_movement
     
-  
+  def update(self):
+    super().update() if hasattr(super(), 'update') else None
+    
+    # Update the display window position if needed
+    new_movement = self.check_for_movement(self.transform)
+    if not np.array_equal(new_movement, np.zeros(2)):
+      self.transform.position = self.transform.position + new_movement
 
 
   ######################################################

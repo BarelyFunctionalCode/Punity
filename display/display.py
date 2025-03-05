@@ -1,27 +1,34 @@
 import tkinter as tk
 import numpy as np
+import platform
+import time
 
 from .face import TkinterFace
 from .terminal import TkinterTerminal
 
 from .object.object import Object
-
-from .movement import Movement
+from .object.movement import Movement
 
 class Display(Object, Movement):
   def __init__(self):
-    super(Display, self).__init__()
-    # Initialize base Tkinter window and the face and terminal objects
-    self.root = tk.Tk()
-    self.root.title("Face")
-    self.root.geometry("200x200+100+100")
-    self.root.config(cursor='none', bg='black')
+    # Initialize base Tkinter window
+    root = tk.Tk()
+    root.overrideredirect(True)
+    root.wm_attributes("-topmost", True)
 
-    self.root.overrideredirect(True)
-    self.root.lift()
-    self.root.wm_attributes("-topmost", True)
-    self.root.wm_attributes("-disabled", True)
-    self.root.wm_attributes("-transparentcolor", "black")
+    if platform.system() == "Windows":
+      root.wm_attributes("-disabled", True)
+      root.wm_attributes("-transparentcolor", "black")
+      root.config(bg='black')
+    else:
+      root.wm_attributes("-transparent", True)
+      root.config(bg='systemTransparent')
+
+    root.config(cursor='none')
+    root.title("Face")
+    root.geometry("200x200+100+100")
+
+    super().__init__(root)
 
     self.is_active = True
     self.is_waking_up = False
@@ -42,6 +49,7 @@ class Display(Object, Movement):
     self.root.mainloop()
     
   def update(self):
+    super().update() if hasattr(super(), 'update') else None
     if not hasattr(self, 'face'): return
 
     if self.face.is_active:
@@ -67,11 +75,6 @@ class Display(Object, Movement):
 
     if self.face.is_asleep and self.move_mode != 'sleep':
       self.set_move_mode('sleep')
-      
-    # Update the display window position if needed
-    new_movement = self.check_for_movement(self.transform)
-    if not np.array_equal(new_movement, np.zeros(2)):
-      self.transform.position = self.transform.position + new_movement
 
   # Used by the assistant to update the face parameters
   def enqueue_update_face(self, new_face_parameters, duration):

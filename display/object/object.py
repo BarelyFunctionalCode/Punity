@@ -1,18 +1,11 @@
 from .transform import Transform
 
 class Object:
-  def __init__(self):
-    super(Object, self).__init__()
-    self._root = None
-
-  @property
-  def root(self):
-    return self._root
-
-  @root.setter
-  def root(self, new_root):
-    self._root = new_root
+  def __init__(self, root):
+    self.root = root
     self.transform = Transform(self)
+    super().__init__()
+
     self._update()
     
   def _update(self):
@@ -20,4 +13,4 @@ class Object:
     self.root.after(10, self._update)
 
   def update(self):
-    print("base class")
+    super().update() if hasattr(super(), 'update') else None
