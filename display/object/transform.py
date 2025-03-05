@@ -1,19 +1,19 @@
-import numpy as np
+from ..utils import Vector2
 
 class Transform:
   def __init__(self, object):
     self.object = object
-    self._last_position = np.array([0, 0])
+    self._last_position = Vector2.zero
 
   @property
   def position(self):
-    return np.array([self.object.root.winfo_x(), self.object.root.winfo_y()])
+    return Vector2([self.object.root.winfo_x(), self.object.root.winfo_y()])
 
   @position.setter
   def position(self, new_position):
     self.object.root.update_idletasks()
-    self._last_position = np.array(self.position)
-    self.object.root.geometry(f"{self.width}x{self.height}+{new_position[0]}+{new_position[1]}")
+    self._last_position = Vector2(self.position)
+    self.object.root.geometry(f"{self.width}x{self.height}+{new_position.x}+{new_position.y}")
 
 
   @property

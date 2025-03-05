@@ -14,7 +14,7 @@ class TkinterFace:
     self.is_asleep = False
 
     # # Canvas for drawing face
-    self.graphic_canvas = tk.Canvas(self.root, height=200, bg='systemTransparent', bd=0, highlightthickness=0, cursor='none')
+    self.graphic_canvas = tk.Canvas(self.root, height=200, bg=self.root['bg'], bd=0, highlightthickness=0, cursor='none')
     self.graphic_canvas.pack(fill=tk.BOTH, padx=0, pady=0, side=tk.TOP)
 
     # Face Parameters

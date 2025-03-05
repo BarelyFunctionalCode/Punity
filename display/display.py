@@ -1,7 +1,5 @@
 import tkinter as tk
-import numpy as np
 import platform
-import time
 
 from .face import TkinterFace
 from .terminal import TkinterTerminal
