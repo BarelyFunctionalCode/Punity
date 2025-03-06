@@ -1,7 +1,7 @@
 import math
 
-from ..utils import Vector2
-from ..environment import Instance as environment
+from utils import Vector2
+from environment import Instance as environment
 
 class Movement:
   def __init__(self):

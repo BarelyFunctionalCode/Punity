@@ -1,9 +1,9 @@
 import numpy as np
 
 from .transform import Transform
-from ..utils import Vector2
+from utils import Vector2
 
-from ..environment import Instance as environment
+from environment import Instance as environment
 
 class Object:
   def __init__(self, name, root, is_static=True):
@@ -72,7 +72,7 @@ class Object:
     col_vec = self.transform.position - self.transform.last_position
 
     collision_response = col_normal * col_vec.magnitude
-    print(f"Base Collision: {col_normal} with {other_object.name}; Response: {collision_response}")
+    # print(f"Base Collision: {col_normal} with {other_object.name}; Response: {collision_response}")
     self.transform.position = self.transform.position + collision_response
 
     super().on_collision(col_normal, col_vec, other_object) if hasattr(super(), 'on_collision') else None

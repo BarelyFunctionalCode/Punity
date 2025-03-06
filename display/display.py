@@ -4,9 +4,9 @@ import platform
 from .face import TkinterFace
 from .terminal import TkinterTerminal
 
-from .object.object import Object
-from .object.movement import Movement
-from .object.rigidbody import Rigidbody
+from object.object import Object
+from object.movement import Movement
+from object.rigidbody import Rigidbody
 
 class Display(Object, Movement, Rigidbody):
   def __init__(self, name):

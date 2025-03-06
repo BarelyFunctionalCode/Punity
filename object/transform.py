@@ -1,4 +1,4 @@
-from ..utils import Vector2
+from utils import Vector2
 
 class Transform:
   def __init__(self, object):

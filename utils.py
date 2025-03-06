@@ -1,3 +1,4 @@
+from enum import Enum
 import numpy as np
 
 ###################################
@@ -133,10 +134,19 @@ class TkMimic:
     pass
     # TODO: Might need to implement this later
 
-
 ###################################
 ########## Util Functions #########
 ###################################
 
 def away_from_zero(x):
   return int(x // 1 + 2 ** (x > 0) - 1)
+
+###################################
+############# Enums ###############
+###################################
+
+class Side(Enum):
+  TOP = 0
+  RIGHT = 1
+  BOTTOM = 2
+  LEFT = 3
