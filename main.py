@@ -17,11 +17,7 @@ class Fren:
     Border(environment.x, environment.y, environment.width, environment.height, 50)
 
     self.root = invis_tk(tk.Tk())
-
     self.display = Display('fren', self.root)
-
-    self.display_proxity_limit = 300
-    self.display_move_speed = 100
 
     self.new_thread = threading.Thread(target=self.worker)
     self.new_thread.start()
@@ -42,7 +38,6 @@ class Fren:
       time.sleep(0.1)
 
   def start(self):
-    # self.display.start()
     try:
       self.root.mainloop()
     except:
