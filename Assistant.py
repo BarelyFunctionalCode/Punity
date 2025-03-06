@@ -2,11 +2,26 @@ import time
 import threading
 
 from display.display import Display
+from display.environment import Instance as environment
+from display.object.object import Object
+from display.utils import TkMimic
 
 class FACE:
   def __init__(self):
     self.text = ""
     self.expression = ""
+
+    self.bounds = environment.bounds
+    self.bounds_thickness = environment.bounds_thickness
+
+    # Top
+    Object(TkMimic(self.bounds[3], self.bounds[0] - self.bounds_thickness, self.bounds[1] - self.bounds[3], self.bounds_thickness))
+    # Right
+    Object(TkMimic(self.bounds[1] - self.bounds_thickness, self.bounds[0], self.bounds_thickness, self.bounds[2] - self.bounds[0]))
+    # Bottom
+    Object(TkMimic(self.bounds[3], self.bounds[2] - self.bounds_thickness, self.bounds[1] - self.bounds[3], self.bounds_thickness))
+    # Left
+    Object(TkMimic(self.bounds[3] - self.bounds_thickness, self.bounds[0], self.bounds_thickness, self.bounds[2] - self.bounds[0]))
 
     self.display = Display()
 

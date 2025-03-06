@@ -28,7 +28,7 @@ class Display(Object, Movement):
 
     root.update_idletasks()
 
-    super().__init__(root)
+    super().__init__(root, False)
 
     self.is_active = True
     self.is_waking_up = False

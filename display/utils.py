@@ -46,6 +46,8 @@ class Vector2:
     return Vector2(self._vec / other)
   
   def __eq__(self, other):
+    if type(other) != Vector2:
+      return False
     return np.array_equal(self._vec, other._vec)
   
   def __str__(self):
@@ -86,6 +88,42 @@ Vector2.down = Vector2([0, -1])
 Vector2.left = Vector2([-1, 0])
 Vector2.right = Vector2([1, 0])
 Vector2.zero = Vector2([0, 0])
+
+
+###################################
+############# TkMimic #############
+###################################
+
+class TkMimic:
+  def __init__(self, x, y, width, height):
+    self.x = x
+    self.y = y
+    self.width = width
+    self.height = height
+
+  def winfo_x(self):
+    return self.x
+  
+  def winfo_y(self):
+    return self.y
+  
+  def winfo_width(self):
+    return self.width
+  
+  def winfo_height(self):
+    return self.height
+  
+  def geometry(self, geometry):
+    geometry = geometry.split('+')
+    self.width, self.height = map(int, geometry[0].split('x'))
+    self.x, self.y = map(int, geometry[1].split('+'))
+  
+  def update_idletasks():
+    pass
+
+  def after(self, time, callback):
+    pass
+    # TODO: Might need to implement this later
 
 
 ###################################
