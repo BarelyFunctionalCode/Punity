@@ -28,6 +28,7 @@ class Rigidbody:
     self.acceleration = Vector2.zero
 
   def on_collision(self, col_normal, _col_vec, _other_object):
+    # TODO: Need to take into account the other object's velocity
     super().on_collision(col_normal, _col_vec, _other_object) if hasattr(super(), 'on_collision') else None
     self.velocity = Vector2.reflect(self.velocity, col_normal) * self.bounciness
 

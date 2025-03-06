@@ -16,9 +16,7 @@ class Fren:
 
     Border(environment.x, environment.y, environment.width, environment.height, 50)
 
-    
     self.root = invis_tk(tk.Tk())
-    self.root.title("Parent")
 
     self.display = Display('fren', self.root)
 

@@ -25,6 +25,8 @@ class Object:
         col_normal = self._collision_check(obj)
         if col_normal != None:
           self.on_collision(col_normal, obj)
+          if not obj.is_static:
+            obj.on_collision(-col_normal, self)
 
     new_position = self.transform.position.astype(Vector2.int)
     self.root.update_idletasks()

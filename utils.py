@@ -52,6 +52,10 @@ class Vector2:
   # Class methods
   def __getitem__(self, key):
     return self._vec[key]
+  
+  # for negative of vector
+  def __neg__(self):
+    return Vector2(-self._vec)
 
   def __add__(self, other):
     return Vector2(self._vec + other._vec)
