@@ -44,17 +44,17 @@ class Object:
     
     if did_collide:
       # Get Collision vector
-      collision_vector = self.transform.position - other.transform.position
+      collision_relative_position = self.transform.position - other.transform.position
 
-      collision_factors = np.array([
+      possible_collisions = np.array([
         # Top side
-        collision_vector.y + self.transform.height,
+        collision_relative_position.y + self.transform.height,
         # Left side
-        collision_vector.x + self.transform.width,
+        collision_relative_position.x + self.transform.width,
         # Bottom side
-        collision_vector.y - other.transform.height,
+        collision_relative_position.y - other.transform.height,
         # Right side
-        collision_vector.x - other.transform.width,
+        collision_relative_position.x - other.transform.width,
       ])
 
       directions = np.array([
@@ -65,7 +65,7 @@ class Object:
       ])
 
       # Get the normal of the collision
-      return directions[np.argmin(np.abs(collision_factors))]
+      return directions[np.argmin(np.abs(possible_collisions))]
     return None
 
   def on_collision(self, col_normal, other_object):

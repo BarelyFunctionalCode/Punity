@@ -84,6 +84,11 @@ class Vector2:
   
   def reflect(vec, normal):
     return vec - 2 * Vector2.dot(vec, normal) * normal
+  
+  def clamp_magnitude(vec, max_magnitude):
+    if vec.magnitude > max_magnitude:
+      return vec.normalized * max_magnitude
+    return vec
 
 # Static variables
 Vector2.up = Vector2([0, -1])

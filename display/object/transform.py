@@ -16,7 +16,7 @@ class Transform:
   def position(self, new_position):
     self._last_position = Vector2(self.position)
     self._position = new_position
-    print(f"Setting position to {new_position} from {self._last_position}")
+    # print(f"Setting position to {new_position} from {self._last_position}")
 
 
   @property
