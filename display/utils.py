@@ -86,8 +86,8 @@ class Vector2:
     return vec - 2 * Vector2.dot(vec, normal) * normal
 
 # Static variables
-Vector2.up = Vector2([0, 1])
-Vector2.down = Vector2([0, -1])
+Vector2.up = Vector2([0, -1])
+Vector2.down = Vector2([0, 1])
 Vector2.left = Vector2([-1, 0])
 Vector2.right = Vector2([1, 0])
 Vector2.zero = Vector2([0, 0])
@@ -119,9 +119,9 @@ class TkMimic:
   def geometry(self, geometry):
     geometry = geometry.split('+')
     self.width, self.height = map(int, geometry[0].split('x'))
-    self.x, self.y = map(int, geometry[1].split('+'))
+    self.x, self.y = map(int, geometry[1:])
   
-  def update_idletasks():
+  def update_idletasks(_):
     pass
 
   def after(self, time, callback):

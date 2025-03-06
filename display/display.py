@@ -8,7 +8,7 @@ from .object.object import Object
 from .object.movement import Movement
 
 class Display(Object, Movement):
-  def __init__(self):
+  def __init__(self, name):
     # Initialize base Tkinter window
     root = tk.Tk()
     root.overrideredirect(True)
@@ -28,12 +28,12 @@ class Display(Object, Movement):
 
     root.update_idletasks()
 
-    super().__init__(root, False)
+    super().__init__(name, root, False)
 
     self.is_active = True
     self.is_waking_up = False
     self.inactivity_timer = 0
-    self.inactivity_timeout = 500
+    self.inactivity_timeout = 100
 
     self.face = TkinterFace(self.root)
     # self.terminal = TkinterTerminal(self.root, self.face.talking_queue)

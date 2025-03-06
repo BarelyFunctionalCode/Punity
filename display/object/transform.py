@@ -3,17 +3,20 @@ from ..utils import Vector2
 class Transform:
   def __init__(self, object):
     self.object = object
-    self._last_position = Vector2(self.position)
+    self._position = Vector2([self.object.root.winfo_x(), self.object.root.winfo_y()])
+    self._last_position = Vector2(self._position)
+    self._width = self.object.root.winfo_width()
+    self._height = self.object.root.winfo_height()
 
   @property
   def position(self):
-    return Vector2([self.object.root.winfo_x(), self.object.root.winfo_y()])
+    return self._position
 
   @position.setter
   def position(self, new_position):
-    self.object.root.update_idletasks()
     self._last_position = Vector2(self.position)
-    self.object.root.geometry(f"{self.width}x{self.height}+{new_position.x}+{new_position.y}")
+    self._position = new_position
+    print(f"Setting position to {new_position} from {self._last_position}")
 
 
   @property
@@ -23,9 +26,9 @@ class Transform:
 
   @property
   def width(self):
-    return self.object.root.winfo_width()
+    return self._width
   
 
   @property
   def height(self):
-    return self.object.root.winfo_height()
+    return self._height

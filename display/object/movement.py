@@ -51,7 +51,7 @@ class Movement:
     # Move the display window based on the mouse position
     move_factor = max(1.0 - distance.magnitude / self.proxity_limit, 0)
     move_amount = math.trunc(self.normal_move_speed * move_factor)
-    return (distance.normalized * move_amount).astype(Vector2.int)
+    return distance.normalized * move_amount
   
 
   def sleep_drift(self):
@@ -62,14 +62,13 @@ class Movement:
     if current_direction == Vector2.zero:
       current_direction = Vector2.random()
 
-    return (current_direction * self.asleep_move_speed).astype(Vector2.int)
+    return current_direction * self.asleep_move_speed
 
-  def on_collision(self, col_normal, other_object):
-    super().on_collision(col_normal, other_object) if hasattr(super(), 'on_collision') else None
+  def on_collision(self, col_normal, col_vec, other_object):
+    super().on_collision(col_normal, col_vec, other_object) if hasattr(super(), 'on_collision') else None
     
-    current_direction = (self.transform.position - self.transform.last_position).normalized
+    if self.move_mode == 'sleep':
+      new_direction = Vector2.reflect(col_vec, col_normal)
 
-    new_direction = Vector2.reflect(current_direction, col_normal)
-
-    collision_response = new_direction * self.asleep_move_speed
-    self.transform.position = self.transform.position + collision_response
+      collision_response = new_direction * self.asleep_move_speed
+      self.transform.position = self.transform.position + collision_response

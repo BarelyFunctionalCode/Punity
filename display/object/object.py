@@ -6,7 +6,8 @@ from ..utils import Vector2
 from ..environment import Instance as environment
 
 class Object:
-  def __init__(self, root, is_static=True):
+  def __init__(self, name, root, is_static=True):
+    self.name = name
     self.root = root
     self.is_static = is_static
     self.transform = Transform(self)
@@ -24,6 +25,10 @@ class Object:
         col_normal = self._collision_check(obj)
         if col_normal != None:
           self.on_collision(col_normal, obj)
+
+    new_position = self.transform.position.astype(Vector2.int)
+    self.root.update_idletasks()
+    self.root.geometry(f"{self.transform.width}x{self.transform.height}+{new_position.x}+{new_position.y}")
     self.root.after(10, self._update)
 
   def update(self):
@@ -64,5 +69,10 @@ class Object:
     return None
 
   def on_collision(self, col_normal, other_object):
-    super().on_collision(col_normal, other_object) if hasattr(super(), 'on_collision') else None
-    print(f'Collision detected from {col_normal}')
+    col_vec = self.transform.position - self.transform.last_position
+
+    collision_response = col_normal * col_vec.magnitude
+    print(f"Base Collision: {col_normal} with {other_object.name}; Response: {collision_response}")
+    self.transform.position = self.transform.position + collision_response
+
+    super().on_collision(col_normal, col_vec, other_object) if hasattr(super(), 'on_collision') else None

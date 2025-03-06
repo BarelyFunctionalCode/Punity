@@ -15,15 +15,15 @@ class FACE:
     self.bounds_thickness = environment.bounds_thickness
 
     # Top
-    Object(TkMimic(self.bounds[3], self.bounds[0] - self.bounds_thickness, self.bounds[1] - self.bounds[3], self.bounds_thickness))
+    Object('top_bound', TkMimic(self.bounds[3], self.bounds[0] - self.bounds_thickness, self.bounds[1] - self.bounds[3], self.bounds_thickness))
     # Right
-    Object(TkMimic(self.bounds[1] - self.bounds_thickness, self.bounds[0], self.bounds_thickness, self.bounds[2] - self.bounds[0]))
+    Object('right_bound', TkMimic(self.bounds[1], self.bounds[0], self.bounds_thickness, self.bounds[2] - self.bounds[0]))
     # Bottom
-    Object(TkMimic(self.bounds[3], self.bounds[2] - self.bounds_thickness, self.bounds[1] - self.bounds[3], self.bounds_thickness))
+    Object('bottom_bound', TkMimic(self.bounds[3], self.bounds[2], self.bounds[1] - self.bounds[3], self.bounds_thickness))
     # Left
-    Object(TkMimic(self.bounds[3] - self.bounds_thickness, self.bounds[0], self.bounds_thickness, self.bounds[2] - self.bounds[0]))
+    Object('left_bound', TkMimic(self.bounds[3] - self.bounds_thickness, self.bounds[0], self.bounds_thickness, self.bounds[2] - self.bounds[0]))
 
-    self.display = Display()
+    self.display = Display('fren')
 
     self.display_proxity_limit = 300
     self.display_move_speed = 100
