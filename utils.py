@@ -1,5 +1,24 @@
 from enum import Enum
 import numpy as np
+import platform
+
+
+def invis_tk(root):
+  root.overrideredirect(True)
+  root.wm_attributes("-topmost", True)
+
+  if platform.system() == "Windows":
+    root.wm_attributes("-disabled", True)
+    root.wm_attributes("-transparentcolor", "black")
+    root.config(bg='black')
+  else:
+    root.wm_attributes("-transparent", True)
+    root.config(bg='systemTransparent')
+
+  root.config(cursor='none')
+  root.geometry("0x0+0+0")
+
+  return root
 
 ###################################
 ############# Vector2 #############
@@ -128,6 +147,9 @@ class TkMimic:
     self.x, self.y = map(int, geometry[1:])
   
   def update_idletasks(_):
+    pass
+
+  def update(_):
     pass
 
   def after(self, time, callback):

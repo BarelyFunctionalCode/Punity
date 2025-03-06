@@ -4,27 +4,17 @@ import platform
 from .face import TkinterFace
 from .terminal import TkinterTerminal
 
-from object.object import Object
-from object.movement import Movement
-from object.rigidbody import Rigidbody
+from components.object import Object
+from components.movement import Movement
+from components.rigidbody import Rigidbody
+
+from utils import invis_tk
 
 class Display(Object, Movement, Rigidbody):
-  def __init__(self, name):
+  def __init__(self, name, parent):
     # Initialize base Tkinter window
-    root = tk.Tk()
-    root.overrideredirect(True)
-    root.wm_attributes("-topmost", True)
-
-    if platform.system() == "Windows":
-      root.wm_attributes("-disabled", True)
-      root.wm_attributes("-transparentcolor", "black")
-      root.config(bg='black')
-    else:
-      root.wm_attributes("-transparent", True)
-      root.config(bg='systemTransparent')
-
-    root.config(cursor='none')
-    root.title("Face")
+    root = invis_tk(tk.Toplevel(parent))
+    root.title(name)
     root.geometry("200x200+100+100")
 
     root.update_idletasks()
@@ -39,18 +29,6 @@ class Display(Object, Movement, Rigidbody):
     self.face = TkinterFace(self.root)
     # self.terminal = TkinterTerminal(self.root, self.face.talking_queue)
 
-  def stop(self):
-    # Stop the Tkinter main loop
-    self.root.destroy()
-    self.root = None
-
-  def start(self):
-    # Start the Tkinter main loop
-    try:
-      self.root.mainloop()
-    except:
-      self.stop()
-    
   def update(self):
     super().update() if hasattr(super(), 'update') else None
     if not hasattr(self, 'face'): return

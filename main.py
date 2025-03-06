@@ -1,19 +1,26 @@
 import time
 import threading
+import tkinter as tk
 
-from display.display import Display
-from utils import Side
 from environment import Instance as environment
-from border import Border
 
-class FACE:
+from objects.display import Display
+from objects.border import Border
+
+from utils import invis_tk
+
+class Fren:
   def __init__(self):
     self.text = ""
     self.expression = ""
 
     Border(environment.x, environment.y, environment.width, environment.height, 50)
 
-    self.display = Display('fren')
+    
+    self.root = invis_tk(tk.Tk())
+    self.root.title("Parent")
+
+    self.display = Display('fren', self.root)
 
     self.display_proxity_limit = 300
     self.display_move_speed = 100
@@ -24,7 +31,7 @@ class FACE:
   def worker(self):
     while True:
       # If the display window is closed, break the loop
-      if self.display.root == None: break
+      if self.root == None: break
 
       # Update the display window with the new text and expression
       if self.text != "":
@@ -37,7 +44,12 @@ class FACE:
       time.sleep(0.1)
 
   def start(self):
-    self.display.start()
+    # self.display.start()
+    try:
+      self.root.mainloop()
+    except:
+      self.root.destroy()
+      self.root = None
     self.new_thread.join()
 
   def speak(self, text):
@@ -48,9 +60,9 @@ class FACE:
 
 
 if __name__ == "__main__":
-  face = FACE()
+  fren = Fren()
   
   # face.speak("Death to all humans")
-  face.update_expression("slow_scan")
+  fren.update_expression("slow_scan")
 
-  face.start()
+  fren.start()
