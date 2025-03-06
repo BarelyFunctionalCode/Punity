@@ -42,6 +42,9 @@ class Vector2:
   def __mul__(self, other):
     return Vector2(self._vec * other)
   
+  def __rmul__(self, other):
+    return Vector2(self._vec * other)
+  
   def __truediv__(self, other):
     return Vector2(self._vec / other)
   

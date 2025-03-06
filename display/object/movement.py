@@ -16,13 +16,13 @@ class Movement:
     print(f'Set move mode to {mode}')
     self.move_mode = mode
 
-  def check_for_movement(self, transform):
+  def check_for_movement(self):
     # Depending on the movement mode, get the new desired display position
     new_movement = Vector2.zero
     if self.move_mode != 'hold': # Always avoid the cursor unless explicitly told not to
-      new_movement = self.cursor_avoidance(transform)
+      new_movement = self.cursor_avoidance()
     if self.move_mode == 'sleep' and new_movement == Vector2.zero:
-      new_movement = self.sleep_drift(transform)
+      new_movement = self.sleep_drift()
 
     return new_movement
     
@@ -30,7 +30,7 @@ class Movement:
     super().update() if hasattr(super(), 'update') else None
     
     # Update the display window position if needed
-    new_movement = self.check_for_movement(self.transform)
+    new_movement = self.check_for_movement()
     if not new_movement == Vector2.zero:
       self.transform.position = self.transform.position + new_movement
 
@@ -39,13 +39,13 @@ class Movement:
   ################## Movement Actions ##################
   ######################################################
 
-  def cursor_avoidance(self, transform):
-    current_position = transform.position
+  def cursor_avoidance(self):
+    current_position = self.transform.position
 
     # vector between mouse and display center
     distance = Vector2([
-      (current_position.x + transform.width // 2) - environment.mouse_position.x,
-      (current_position.y + transform.height // 2) - environment.mouse_position.y
+      (current_position.x + self.transform.width // 2) - environment.mouse_position.x,
+      (current_position.y + self.transform.height // 2) - environment.mouse_position.y
     ])
 
     # Move the display window based on the mouse position
@@ -54,9 +54,9 @@ class Movement:
     return (distance.normalized * move_amount).astype(Vector2.int)
   
 
-  def sleep_drift(self, transform):
+  def sleep_drift(self):
     # Determine if it is already moving and what direction
-    current_direction = (transform.position - transform.last_position).normalized
+    current_direction = (self.transform.position - self.transform.last_position).normalized
 
     # Randomly select a direction to drift in
     if current_direction == Vector2.zero:
@@ -64,5 +64,12 @@ class Movement:
 
     return (current_direction * self.asleep_move_speed).astype(Vector2.int)
 
-
+  def on_collision(self, col_normal, other_object):
+    super().on_collision(col_normal, other_object) if hasattr(super(), 'on_collision') else None
     
+    current_direction = (self.transform.position - self.transform.last_position).normalized
+
+    new_direction = Vector2.reflect(current_direction, col_normal)
+
+    collision_response = new_direction * self.asleep_move_speed
+    self.transform.position = self.transform.position + collision_response

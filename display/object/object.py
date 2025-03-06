@@ -21,9 +21,9 @@ class Object:
     if not self.is_static:
       for obj in environment.objects:
         if obj == self: continue
-        direction = self._collision_check(obj)
-        if direction != None:
-          self.transform.on_collision(direction)
+        col_normal = self._collision_check(obj)
+        if col_normal != None:
+          self.on_collision(col_normal, obj)
     self.root.after(10, self._update)
 
   def update(self):
@@ -59,10 +59,10 @@ class Object:
         Vector2.right,
       ])
 
-      # Get the direction of the collision
-      direction = directions[np.argmin(np.abs(collision_factors))]
-
-      return direction
+      # Get the normal of the collision
+      return directions[np.argmin(np.abs(collision_factors))]
     return None
 
-
+  def on_collision(self, col_normal, other_object):
+    super().on_collision(col_normal, other_object) if hasattr(super(), 'on_collision') else None
+    print(f'Collision detected from {col_normal}')

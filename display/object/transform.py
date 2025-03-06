@@ -29,6 +29,3 @@ class Transform:
   @property
   def height(self):
     return self.object.root.winfo_height()
-  
-  def on_collision(self, direction):
-    print(f'Collision detected from {direction}')
