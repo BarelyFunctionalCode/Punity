@@ -22,8 +22,9 @@ class Fren(Object, Movement, Rigidbody):
     self.is_active = True
     self.is_waking_up = False
     self.inactivity_timer = 0
-    self.inactivity_timeout = 5000
-    self.terminal_despawn_time = 500
+    self.inactivity_timeout = 500
+    self.terminal_despawn_timer = 0
+    self.terminal_despawn_timeout = 500
 
     self.face = TkinterFace(root)
     self.terminal = None
@@ -33,27 +34,30 @@ class Fren(Object, Movement, Rigidbody):
   def start(self):
     self.set_face_expression("slow_scan")
 
-    self.root.after(2000, lambda: self.enqueue_update_text("Hello! I'm Fren, your personal assistant!"))
+    self.root.after(8000, lambda: self.enqueue_update_text("I make big shid, and I'm not sorry.\n\n\n💩"))
 
   def update(self):
     super().update() if hasattr(super(), 'update') else None
     if not hasattr(self, 'face'): return
 
-    # if self.face.is_active:
-    if self.face.is_active or (self.terminal and self.terminal.is_active):
+    if self.terminal and self.terminal.is_destroyed:
+      self.terminal = None
+    if self.terminal and self.terminal.is_active:
+      self.terminal_despawn_timer = 0
+    if self.face.is_active:
       self.inactivity_timer = 0
 
-    # if self.is_active and not self.face.is_active:
-    if self.is_active and not self.face.is_active and (not self.terminal or (self.terminal and not self.terminal.is_active)):
-      self.inactivity_timer += 1
+    if self.is_active:
+      if self.terminal and not self.terminal.is_active:
+        self.terminal_despawn_timer += 1
+      if not self.terminal and not self.face.is_active:
+        self.inactivity_timer += 1
 
-      if self.terminal and self.inactivity_timer > self.terminal_despawn_time:
+      if self.terminal and self.terminal_despawn_timer > self.terminal_despawn_timeout:
         self.terminal.destroy()
-        self.terminal = None
       if not self.terminal and self.inactivity_timer > self.inactivity_timeout:
         self.is_active = False
         self.face.set_face_expression("sleep")
-        # self.terminal.set_enabled(False)
 
     if not self.is_active and not self.is_waking_up and self.inactivity_timer < self.inactivity_timeout:
       self.face.set_face_expression("wake")
@@ -64,7 +68,6 @@ class Fren(Object, Movement, Rigidbody):
         self.is_waking_up = False
         if not self.terminal and not self.terminal_update_queue.empty():
           self.terminal = TkinterTerminal(self, self.terminal_update_queue, self.face.talking_queue)
-        # self.terminal.set_enabled(True)
 
     if self.face.is_asleep and self.move_mode != 'sleep':
       self.set_move_mode('sleep')

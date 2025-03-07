@@ -8,25 +8,27 @@ class TkinterTerminal:
 
     self.root = invis_tk(tk.Toplevel(parent_obj.root))
     self.root.title(f'{parent_obj.root.title()} Terminal')
-    self.root.geometry(f"300x100+{parent_position[0]}+{parent_position[1]}")
+    self.root.geometry(f"300x100+{parent_position[0]}+{parent_position[1] - 100}")
+    self.root.wm_attributes("-alpha", 0.0)
 
     self.root.update_idletasks()
 
     self.update_queue = update_queue
     self.talking_queue = talking_queue
     self.is_active = False
-    # self.is_enabled = True
+    self.do_destroy = False
+    self.is_destroyed = False
 
     # Terminal Parameters
     self.terminal_text_output = ""
     self.terminal_text_output_index = 0
 
     # Terminal for text output
-    self.frame = tk.Frame(self.root, bg="", cursor='none')
-    self.frame.pack(fill=tk.BOTH, padx=1, pady=(0,1), side=tk.BOTTOM)
+    self.frame = tk.Frame(self.root, bg="black", cursor='none')
+    self.frame.pack(fill=tk.BOTH, padx=0, pady=(0,0), side=tk.BOTTOM)
 
     self.terminal_text = tk.Text(self.frame, state='disabled', wrap='word', bg="black", fg="green", font=("Courier", 10), borderwidth=0, highlightthickness=0, insertbackground="green")
-    self.terminal_text.pack()
+    self.terminal_text.pack(padx=10, pady=10)
 
     # Add blinking cursor
     self.terminal_text.config(state='normal')
@@ -37,14 +39,26 @@ class TkinterTerminal:
     self.update()
     self.blink_cursor()
 
-  # Used to set the active state of the terminal
-  # def set_enabled(self, is_enabled):
-  #   self.is_enabled = is_enabled
-
   def destroy(self):
-    self.root.destroy()
+    self.do_destroy = True
 
   def update(self):
+    # Fade out terminal
+    if self.do_destroy:
+      if self.root.wm_attributes("-alpha") > 0.0:
+        self.root.wm_attributes("-alpha", self.root.wm_attributes("-alpha") - 0.1)
+        self.root.after(50, self.update)
+        return
+      self.root.destroy()
+      self.is_destroyed = True
+      return
+
+    # Fade in terminal
+    if self.root.wm_attributes("-alpha") < 1.0:
+      self.root.wm_attributes("-alpha", self.root.wm_attributes("-alpha") + 0.1)
+      self.root.after(50, self.update)
+      return
+    
     # Update text output from queue
     new_line = False
     if not self.update_queue.empty() and not self.is_active: self.is_active = True
