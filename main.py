@@ -15,8 +15,9 @@ if __name__ == "__main__":
   root = invis_tk(tk.Tk())
 
   # Create the fren object
-  display = Fren('fren', root)
+  Fren('fren', root)
 
+  # Run the main loop
   try:
     root.mainloop()
   except:

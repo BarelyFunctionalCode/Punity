@@ -1,4 +1,5 @@
 import tkinter as tk
+from queue import Queue
 
 from .face import TkinterFace
 from .terminal import TkinterTerminal
@@ -21,27 +22,35 @@ class Fren(Object, Movement, Rigidbody):
     self.is_active = True
     self.is_waking_up = False
     self.inactivity_timer = 0
-    self.inactivity_timeout = 100
+    self.inactivity_timeout = 5000
+    self.terminal_despawn_time = 500
 
     self.face = TkinterFace(root)
-    # self.terminal = TkinterTerminal(self.root, self.face.talking_queue)
+    self.terminal = None
+    self.terminal_update_queue = Queue()
     super().__init__(name, root, False)
 
   def start(self):
     self.set_face_expression("slow_scan")
 
+    self.root.after(2000, lambda: self.enqueue_update_text("Hello! I'm Fren, your personal assistant!"))
+
   def update(self):
     super().update() if hasattr(super(), 'update') else None
     if not hasattr(self, 'face'): return
 
-    if self.face.is_active:
-    # if self.face.is_active or self.terminal.is_active:
+    # if self.face.is_active:
+    if self.face.is_active or (self.terminal and self.terminal.is_active):
       self.inactivity_timer = 0
 
-    if self.is_active and not self.face.is_active:
-    # if self.is_active and not self.face.is_active and not self.terminal.is_active:
+    # if self.is_active and not self.face.is_active:
+    if self.is_active and not self.face.is_active and (not self.terminal or (self.terminal and not self.terminal.is_active)):
       self.inactivity_timer += 1
-      if self.inactivity_timer > self.inactivity_timeout:
+
+      if self.terminal and self.inactivity_timer > self.terminal_despawn_time:
+        self.terminal.destroy()
+        self.terminal = None
+      if not self.terminal and self.inactivity_timer > self.inactivity_timeout:
         self.is_active = False
         self.face.set_face_expression("sleep")
         # self.terminal.set_enabled(False)
@@ -53,6 +62,8 @@ class Fren(Object, Movement, Rigidbody):
       if self.face.is_enabled:
         self.is_active = True
         self.is_waking_up = False
+        if not self.terminal and not self.terminal_update_queue.empty():
+          self.terminal = TkinterTerminal(self, self.terminal_update_queue, self.face.talking_queue)
         # self.terminal.set_enabled(True)
 
     if self.face.is_asleep and self.move_mode != 'sleep':
@@ -64,7 +75,9 @@ class Fren(Object, Movement, Rigidbody):
 
   # Used by the assistant to update the terminal text
   def enqueue_update_text(self, text):
-    self.terminal.update_queue.put(text)
+    self.terminal_update_queue.put(text)
+    if not self.terminal:
+      self.terminal = TkinterTerminal(self, self.terminal_update_queue, self.face.talking_queue)
 
   # Used by the assistant to set the face expression
   def set_face_expression(self, expression):

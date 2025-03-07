@@ -9,8 +9,8 @@ def invis_tk(root):
 
   if platform.system() == "Windows":
     root.wm_attributes("-disabled", True)
-    root.wm_attributes("-transparentcolor", "black")
-    root.config(bg='black')
+    root.wm_attributes("-transparentcolor", "white")
+    root.config(bg='white')
   else:
     root.wm_attributes("-transparent", True)
     root.config(bg='systemTransparent')
