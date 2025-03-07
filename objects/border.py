@@ -1,4 +1,4 @@
-from components.object import Object
+from .object import Object
 from utils import Side, TkMimic
 
 class BorderSide(Object):

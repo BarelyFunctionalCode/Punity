@@ -1,6 +1,6 @@
 import numpy as np
 
-from .transform import Transform
+from components.transform import Transform
 from utils import Vector2
 
 from environment import Instance as environment
@@ -14,6 +14,7 @@ class Object:
     super().__init__()
 
     environment.objects = np.append(environment.objects, self)
+    self.start()
     self._update()
     
   def _update(self):
@@ -32,6 +33,9 @@ class Object:
     self.root.update_idletasks()
     self.root.geometry(f"{self.transform.width}x{self.transform.height}+{new_position.x}+{new_position.y}")
     self.root.after(10, self._update)
+
+  def start(self):
+    super().start() if hasattr(super(), 'start') else None
 
   def update(self):
     super().update() if hasattr(super(), 'update') else None

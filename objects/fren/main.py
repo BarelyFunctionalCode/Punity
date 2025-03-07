@@ -3,13 +3,13 @@ import tkinter as tk
 from .face import TkinterFace
 from .terminal import TkinterTerminal
 
-from components.object import Object
+from ..object import Object
 from components.movement import Movement
 from components.rigidbody import Rigidbody
 
 from utils import invis_tk
 
-class Display(Object, Movement, Rigidbody):
+class Fren(Object, Movement, Rigidbody):
   def __init__(self, name, parent):
     # Initialize base Tkinter window
     root = invis_tk(tk.Toplevel(parent))
@@ -18,15 +18,17 @@ class Display(Object, Movement, Rigidbody):
 
     root.update_idletasks()
 
-    super().__init__(name, root, False)
-
     self.is_active = True
     self.is_waking_up = False
     self.inactivity_timer = 0
     self.inactivity_timeout = 100
 
-    self.face = TkinterFace(self.root)
+    self.face = TkinterFace(root)
     # self.terminal = TkinterTerminal(self.root, self.face.talking_queue)
+    super().__init__(name, root, False)
+
+  def start(self):
+    self.set_face_expression("slow_scan")
 
   def update(self):
     super().update() if hasattr(super(), 'update') else None
