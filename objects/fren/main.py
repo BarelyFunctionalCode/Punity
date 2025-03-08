@@ -11,11 +11,11 @@ from components.rigidbody import Rigidbody
 from utils import invis_tk
 
 class Fren(Object, Movement, Rigidbody):
-  def __init__(self, name, parent):
+  def __init__(self, name, parent, x=0, y=0):
     # Initialize base Tkinter window
     root = invis_tk(tk.Toplevel(parent))
     root.title(name)
-    root.geometry("200x200+100+100")
+    root.geometry(f"200x200+{x}+{y}")
 
     root.update_idletasks()
 
@@ -33,6 +33,7 @@ class Fren(Object, Movement, Rigidbody):
 
   def start(self):
     super().start() if hasattr(super(), 'start') else None
+    self.use_gravity = False
     self.set_face_expression("slow_scan")
 
     self.root.after(8000, lambda: self.enqueue_update_text("I make big shid, and I'm not sorry.\n\n\n💩"))

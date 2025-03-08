@@ -7,6 +7,7 @@ from objects.border import Border
 
 
 from effects.hole_punch import HolePunch
+from objects.fren.actions.hole_punch_entrance import HolePunchEntrance
 
 from utils import invis_tk
 
@@ -18,11 +19,13 @@ if __name__ == "__main__":
   root = invis_tk(tk.Tk())
 
   # Create the fren object
-  Fren('fren', root)
+  # Fren('fren', root)
+  entrance = HolePunchEntrance(root, 100, 100)
+  fren = entrance.fren
 
   # Test hole punch
-  HolePunch(root, [0,0, 100,50, 200,0, 130,130, 200,200, 0,200], 500, 100, 5000)
-  HolePunch(root, [0,50, 50,0, 100,0, 150,70, 120,100, 80,150, 30,100], 700, 300, 8000)
+  # HolePunch(root, [0,0, 100,50, 200,0, 130,130, 200,200, 0,200], 500, 100, 5000)
+  # HolePunch(root, [0,50, 50,0, 100,0, 150,70, 120,100, 80,150, 30,100], 700, 300, 8000)
 
   # Run the main loop
   try:
