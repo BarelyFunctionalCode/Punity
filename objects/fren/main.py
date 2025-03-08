@@ -22,9 +22,9 @@ class Fren(Object, Movement, Rigidbody):
     self.is_active = True
     self.is_waking_up = False
     self.inactivity_timer = 0
-    self.inactivity_timeout = 500
+    self.inactivity_timeout = 2000
     self.terminal_despawn_timer = 0
-    self.terminal_despawn_timeout = 500
+    self.terminal_despawn_timeout = 5000
 
     self.face = TkinterFace(root)
     self.terminal = None
@@ -32,6 +32,7 @@ class Fren(Object, Movement, Rigidbody):
     super().__init__(name, root, False)
 
   def start(self):
+    super().start() if hasattr(super(), 'start') else None
     self.set_face_expression("slow_scan")
 
     self.root.after(8000, lambda: self.enqueue_update_text("I make big shid, and I'm not sorry.\n\n\n💩"))
@@ -49,9 +50,9 @@ class Fren(Object, Movement, Rigidbody):
 
     if self.is_active:
       if self.terminal and not self.terminal.is_active:
-        self.terminal_despawn_timer += 1
+        self.terminal_despawn_timer += self.delta_time
       if not self.terminal and not self.face.is_active:
-        self.inactivity_timer += 1
+        self.inactivity_timer += self.delta_time
 
       if self.terminal and self.terminal_despawn_timer > self.terminal_despawn_timeout:
         self.terminal.destroy()

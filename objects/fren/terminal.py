@@ -46,7 +46,7 @@ class TkinterTerminal:
     # Fade out terminal
     if self.do_destroy:
       if self.root.wm_attributes("-alpha") > 0.0:
-        self.root.wm_attributes("-alpha", self.root.wm_attributes("-alpha") - 0.1)
+        self.root.wm_attributes("-alpha", self.root.wm_attributes("-alpha") - 0.05)
         self.root.after(50, self.update)
         return
       self.root.destroy()
@@ -55,7 +55,7 @@ class TkinterTerminal:
 
     # Fade in terminal
     if self.root.wm_attributes("-alpha") < 1.0:
-      self.root.wm_attributes("-alpha", self.root.wm_attributes("-alpha") + 0.1)
+      self.root.wm_attributes("-alpha", self.root.wm_attributes("-alpha") + 0.05)
       self.root.after(50, self.update)
       return
     

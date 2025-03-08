@@ -1,3 +1,4 @@
+import time
 import numpy as np
 
 from components.transform import Transform
@@ -10,16 +11,24 @@ class Object:
     self.name = name
     self.root = root
     self.is_static = is_static
+    self.collision_enabled = False
     self.transform = Transform(self)
     super().__init__()
+
+    self.last_update_time = time.time()
 
     environment.objects = np.append(environment.objects, self)
     self.start()
     self._update()
+
+  @property
+  def delta_time(self):
+    return (time.time() - self.last_update_time) * 1000
     
   def _update(self):
     if self.root == None: return
     self.update()
+    if self.root == None: return
     if not self.is_static:
       for obj in environment.objects:
         if obj == self: continue
@@ -29,9 +38,10 @@ class Object:
           if not obj.is_static:
             obj.on_collision(-col_normal, self)
 
-    new_position = self.transform.position.astype(Vector2.int)
-    self.root.update_idletasks()
-    self.root.geometry(f"{self.transform.width}x{self.transform.height}+{new_position.x}+{new_position.y}")
+      new_position = self.transform.position.astype(Vector2.int)
+      self.root.update_idletasks()
+      self.root.geometry(f"{self.transform.width}x{self.transform.height}+{new_position.x}+{new_position.y}")
+    self.last_update_time = time.time()
     self.root.after(10, self._update)
 
   def start(self):
@@ -40,7 +50,13 @@ class Object:
   def update(self):
     super().update() if hasattr(super(), 'update') else None
 
+  def destroy(self):
+    self.root.destroy()
+    self.root = None
+    environment.objects = np.delete(environment.objects, np.where(environment.objects == self))
+    
   def _collision_check(self, other):
+    if not self.collision_enabled or not other.collision_enabled: return None
     did_collide = False
     if self.transform.position.x < other.transform.position.x + other.transform.width and \
        self.transform.position.x + self.transform.width > other.transform.position.x and \

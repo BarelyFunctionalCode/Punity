@@ -12,12 +12,17 @@ class Rigidbody:
     self.max_speed = 100
     self.mass = 1
     self.bounciness = 1.0
+    self.gravity_modifier = 1.0
+
+  def start(self):
+    super().start() if hasattr(super(), 'start') else None
+    self.collision_enabled = True
 
   def update(self):
     super().update() if hasattr(super(), 'update') else None
 
     if self.use_gravity:
-      self.acceleration += Vector2.down * GRAVITY
+      self.acceleration += Vector2.down * GRAVITY * self.gravity_modifier
 
     self.velocity += self.acceleration
     self.velocity -= self.velocity * self.drag

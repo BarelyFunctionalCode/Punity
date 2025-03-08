@@ -15,6 +15,10 @@ class BorderSide(Object):
     name = f"{side.name}_bound"
     super().__init__(name, root, True)
 
+  def start(self):
+    super().start() if hasattr(super(), 'start') else None
+    self.collision_enabled = True
+
 class Border:
   def __init__(self, x, y, width, height, thickness):
     self.top = BorderSide(Side.TOP, x, y, width, height, thickness)
