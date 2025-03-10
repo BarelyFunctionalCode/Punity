@@ -1,27 +1,30 @@
 from .object import Object
-from utils import Side, TkMimic
+from utils import Side
 
 class BorderSide(Object):
-  def __init__(self, side: Side, x, y, width, height, thickness):
+  def __init__(self, parent, side: Side, width, height, x, y, thickness):
     if side == Side.TOP:
-      root = TkMimic(x, y - thickness, width, thickness)
+      params = [width, thickness, x, y - thickness]
     elif side == Side.RIGHT:
-      root = TkMimic(x + width, y, thickness, height)
+      params = [thickness, height, x + width, y]
     elif side == Side.BOTTOM:
-      root = TkMimic(x, y + height, width, thickness)
+      params = [width, thickness, x, y + height]
     elif side == Side.LEFT:
-      root = TkMimic(x - thickness, y, thickness, height)
+      params = [thickness, height, x - thickness, y]
 
     name = f"{side.name}_bound"
-    super().__init__(name, root, True)
+    super().__init__(parent, name, *params, True)
+
 
   def start(self):
     super().start() if hasattr(super(), 'start') else None
     self.collision_enabled = True
 
+
+
 class Border:
-  def __init__(self, x, y, width, height, thickness):
-    self.top = BorderSide(Side.TOP, x, y, width, height, thickness)
-    self.right = BorderSide(Side.RIGHT, x, y, width, height, thickness)
-    self.bottom = BorderSide(Side.BOTTOM, x, y, width, height, thickness)
-    self.left = BorderSide(Side.LEFT, x, y, width, height, thickness)
+  def __init__(self, parent, width, height, x, y, thickness):
+    self.top = BorderSide(parent, Side.TOP, width, height, x, y, thickness)
+    self.right = BorderSide(parent, Side.RIGHT, width, height, x, y, thickness)
+    self.bottom = BorderSide(parent, Side.BOTTOM, width, height, x, y, thickness)
+    self.left = BorderSide(parent, Side.LEFT, width, height, x, y, thickness)

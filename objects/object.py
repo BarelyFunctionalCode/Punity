@@ -1,15 +1,21 @@
+import tkinter as tk
 import time
 import numpy as np
 
 from components.transform import Transform
-from utils import Vector2
+from utils import Vector2, invis_tk
 
 from environment import Instance as environment
 
 class Object:
-  def __init__(self, name, root, is_static=True):
-    self.name = name
-    self.root = root
+  def __init__(self, parent, name, width, height, x, y, is_static=True):
+    self.parent = parent
+    self.name = f"{name}_{id(self)}"
+    self.root = invis_tk(tk.Toplevel(parent))
+    self.root.title(self.name)
+    self.root.geometry(f"{width}x{height}+{x}+{y}")
+    self.root.update_idletasks()
+
     self.is_static = is_static
     self.collision_enabled = False
     self.collision_ignore_list = []

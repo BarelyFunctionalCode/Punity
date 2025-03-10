@@ -1,11 +1,8 @@
-import tkinter as tk
-
 from objects.object import Object
 from objects.hole import Hole
 from objects.screen_chunk import ScreenChunk
 
 from components.rigidbody import Rigidbody
-from utils import invis_tk
 
 from environment import Instance as environment
 
@@ -23,28 +20,25 @@ class ScreenChunkRigidbody(ScreenChunk, Rigidbody):
     super().update() if hasattr(super(), 'update') else None
 
 
+
 class HolePunch(Object):
   def __init__(self, parent, hole_polygon, x, y, lifetime=-1, collision_enabled=True):
-    # Initialize base Tkinter window
-    root = invis_tk(tk.Toplevel(parent))
-    name = f"hole_punch_{id(self)}"
-    root.title(name)
-    root.geometry(f"0x0+{x}+{y}")
+    self.hole_polygon = hole_polygon
+    self.lifetime = lifetime
+    self.collision_enabled = collision_enabled
+    super().__init__(parent, 'hole_punch', 0, 0, x, y,True)
 
-    # Create the hole object
-    self.hole = Hole(root, hole_polygon, x, y, lifetime)
-
-    # Create the screen chunk object
-    self.screen_chunk = ScreenChunkRigidbody(root, hole_polygon, x, y, lifetime if collision_enabled else -1, collision_enabled)
-
-    super().__init__(name, root, True)
 
   def start(self):
     super().start() if hasattr(super(), 'start') else None
+    # Create the hole object
+    self.hole = Hole(self.root, self.hole_polygon, self.transform.position.x, self.transform.position.y, self.lifetime)
+    # Create the screen chunk object
+    self.screen_chunk = ScreenChunkRigidbody(self.root, self.hole_polygon, self.transform.position.x, self.transform.position.y, self.lifetime if self.collision_enabled else -1, self.collision_enabled)
+
 
   def update(self):
     super().update() if hasattr(super(), 'update') else None
-
     if self.screen_chunk and self.screen_chunk.transform.position.y > environment.height:
       self.screen_chunk.destroy()
       self.screen_chunk = None

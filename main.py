@@ -10,11 +10,12 @@ from objects.screen_chunk import ScreenChunk
 from utils import invis_tk, Vector2
 
 if __name__ == "__main__":
-  # Create the border objects for the screen
-  Border(environment.x, environment.y, environment.width, environment.height, 50)
 
   # Root object for all other objects to spawn from
   root = invis_tk(tk.Tk())
+
+  # Create the border objects for the screen
+  Border(root, environment.width, environment.height, environment.x, environment.y, 50)
 
   # Create the fren object
   # Fren(root)

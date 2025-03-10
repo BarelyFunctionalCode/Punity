@@ -1,4 +1,3 @@
-import tkinter as tk
 from queue import Queue
 
 from .face import TkinterFace
@@ -10,31 +9,22 @@ from components.rigidbody import Rigidbody
 
 from . import actions
 
-from utils import invis_tk
-
 class Fren(Object, Movement, Rigidbody):
   def __init__(self, parent, entrance=None):
-    name = f"fren_{id(self)}"
-    self.name = name
-    # self.face_polygon =  [50,30, 150,30, 170,50, 175,120, 150,170, 120,190, 80,190, 50,170, 25,120, 30,50, 50,30,]
-    # face_polygon with -30 to all values
     self.face_polygon = [20,0, 120,0, 140,20, 145,90, 120,140, 90,160, 50,160, 20,140, -5,90, 0,20, 20,0,]
-
     x = 200
     y = 200
     self.entrance = None
     if entrance in actions.entrances:
-      self.entrance = actions.entrances[entrance](parent, self)
+      self.entrance = actions.entrances[entrance]
       x = self.entrance.spawn_position.x
       y = self.entrance.spawn_position.y
+    super().__init__(parent, 'fren', 140, 170, x, y, False)
+    
 
-
-    # Initialize base Tkinter window
-    root = invis_tk(tk.Toplevel(parent))
-    root.title(name)
-    root.geometry(f"140x170+{x}+{y}")
-
-    root.update_idletasks()
+  def start(self):
+    super().start() if hasattr(super(), 'start') else None
+    self.use_gravity = False
 
     self.is_active = True
     self.is_waking_up = False
@@ -42,23 +32,16 @@ class Fren(Object, Movement, Rigidbody):
     self.inactivity_timeout = 2000
     self.terminal_despawn_timer = 0
     self.terminal_despawn_timeout = 5000
-
-    self.face = TkinterFace(root, self.face_polygon)
     self.terminal = None
     self.terminal_update_queue = Queue()
-    super().__init__(name, root, False)
+
+    self.face = TkinterFace(self.root, [20,0, 120,0, 140,20, 145,90, 120,140, 90,160, 50,160, 20,140, -5,90, 0,20, 20,0,])
 
     if self.entrance:
-      self.entrance.post_fren_spawn()
-
-  def start(self):
-    super().start() if hasattr(super(), 'start') else None
-    self.use_gravity = False
-
-    if self.entrance:
-      self.entrance.trigger(self)
+      self.entrance = self.entrance(self.parent, self)
 
     self.root.after(8000, lambda: self.enqueue_update_text("I make big shid, and I'm not sorry.\n\n\n💩"))
+
 
   def update(self):
     super().update() if hasattr(super(), 'update') else None
