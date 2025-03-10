@@ -5,11 +5,9 @@ from environment import Instance as environment
 from objects.fren import Fren
 from objects.border import Border
 
+from objects.screen_chunk import ScreenChunk
 
-from effects.hole_punch import HolePunch
-from objects.fren.actions.hole_punch_entrance import HolePunchEntrance
-
-from utils import invis_tk
+from utils import invis_tk, Vector2
 
 if __name__ == "__main__":
   # Create the border objects for the screen
@@ -19,13 +17,11 @@ if __name__ == "__main__":
   root = invis_tk(tk.Tk())
 
   # Create the fren object
-  # Fren('fren', root)
-  entrance = HolePunchEntrance(root, 100, 100)
-  fren = entrance.fren
+  # Fren(root)
+  Fren(root, 'hole_punch')
 
-  # Test hole punch
-  # HolePunch(root, [0,0, 100,50, 200,0, 130,130, 200,200, 0,200], 500, 100, 5000)
-  # HolePunch(root, [0,50, 50,0, 100,0, 150,70, 120,100, 80,150, 30,100], 700, 300, 8000)
+  # Create the screen chunk object
+  # ScreenChunk(root, [0,0, 200,0, 200,200, 0,200, 0,0], 500, 300, 5000, False, True, Vector2([500, 500]), Vector2([100, 100]))
 
   # Run the main loop
   try:

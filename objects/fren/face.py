@@ -6,22 +6,26 @@ import datetime as date
 from .expressions import expressions
 
 class TkinterFace:
-  def __init__(self, root):
+  def __init__(self, root, face_polygon):
     self.root = root
+    self.face_polygon = face_polygon
     self.is_active = False
     self.is_enabled = True
 
     self.is_asleep = False
 
+    self.width = root.winfo_width()
+    self.height = root.winfo_height()
+
     # Canvas for drawing face
-    self.graphic_canvas = tk.Canvas(self.root, bg=self.root['bg'], bd=0, highlightthickness=0, cursor='none')
-    self.graphic_canvas.pack(fill=tk.BOTH, padx=0, pady=0, side=tk.TOP)
+    self.graphic_canvas = tk.Canvas(self.root, width=self.width, height=self.height, bg=self.root['bg'], bd=0, highlightthickness=0, cursor='none')
+    self.graphic_canvas.pack(padx=0, pady=0, side=tk.TOP)
 
     # Face Parameters
     self.face_parameters = {
       "look_target": {
-        "current_value": np.array([100.0, 75.0, 1000.0]),
-        "target_value": np.array([100.0, 75.0, 1000.0]),
+        "current_value": np.array([self.width / 2, self.height / 3, 1000.0]),
+        "target_value": np.array([self.width / 2, self.height / 3, 1000.0]),
         "max_speed": 20,
         "min_speed": 1,
         "speed_factor": 1.0
@@ -57,8 +61,8 @@ class TkinterFace:
         "speed_factor": 1.0,
       },
       "face_position": {
-        "current_value": np.array([100.0, 75.0, 0]),
-        "target_value": np.array([100.0, 75.0, 0]),
+        "current_value": np.array([self.width / 2, 75.0, 0]),
+        "target_value": np.array([self.width / 2, 75.0, 0]),
         "max_speed": 20,
         "min_speed": 1,
         "speed_factor": 1.0,
@@ -201,7 +205,7 @@ class TkinterFace:
 
     # Eye position and generating oval coordinates for canvas
     eye_distance = 35.0 * self.face_parameters["face_scale"]["current_value"]
-    eye_offset_pos = np.array([0,0]) * self.face_parameters["face_scale"]["current_value"]
+    eye_offset_pos = np.array([0,-30]) * self.face_parameters["face_scale"]["current_value"]
     eye_positions = [
       self.face_parameters["face_position"]["current_value"][:2] - np.array([eye_distance, 0]) + eye_offset_pos + (look_direction[:2] * 70.0),
       self.face_parameters["face_position"]["current_value"][:2] + np.array([eye_distance, 0]) + eye_offset_pos + (look_direction[:2] * 70.0)
@@ -243,7 +247,7 @@ class TkinterFace:
     mouth_sine = mouth_sine * mouth_amplitude
 
     # Calculate mouth position based on face position and mouth offset
-    mouth_offset_pos = np.array([0, 75.0]) * self.face_parameters["face_scale"]["current_value"]
+    mouth_offset_pos = np.array([0, 45.0]) * self.face_parameters["face_scale"]["current_value"]
     mouth_center = np.array([0, 0])
     mouth_length = (50.0 + 50.0 * (1.0 - self.face_parameters["mouth_open_factor"]["current_value"])) * self.face_parameters["face_scale"]["current_value"]
     mouth_start = self.face_parameters["face_position"]["current_value"][:2] + mouth_offset_pos + mouth_center - np.array([mouth_length / 2, 0])
@@ -261,7 +265,7 @@ class TkinterFace:
 
     # Draw Face
     if self.graphic_canvas.find_all() == ():
-      self.graphic_canvas.create_polygon(50,30, 150,30, 170,50, 175,120, 150,170, 120,190, 80,190, 50,170, 25,120, 30,50, outline='#003300', fill='#004400', stipple='gray75', smooth=True, width=2)
+      self.graphic_canvas.create_polygon(*self.face_polygon, fill='#004400', stipple='gray75', smooth=True)
       self.eyes[0] = self.graphic_canvas.create_rectangle(eye_ovals[0], outline='green', width=4)
       self.eyes[1] = self.graphic_canvas.create_rectangle(eye_ovals[1], outline='green', width=4)
       self.pupils[0] = self.graphic_canvas.create_rectangle(pupil_ovals[0], outline='#008800', width=1, fill='#008800')

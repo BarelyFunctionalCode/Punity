@@ -22,8 +22,8 @@ class Hole(Object):
     root.update_idletasks()
 
     # Make empty canvas
-    self.graphic_canvas = tk.Canvas(root, bg=root['bg'], bd=0, highlightthickness=0, cursor='none')
-    self.graphic_canvas.pack(fill=tk.BOTH, padx=0, pady=0, side=tk.TOP)
+    self.graphic_canvas = tk.Canvas(root, width=width, height=height, bg=root['bg'], bd=0, highlightthickness=0, cursor='none')
+    self.graphic_canvas.pack(padx=0, pady=0, side=tk.TOP)
 
     # Draw hole polygon
     self.graphic_canvas.create_polygon(hole_polygon, fill='black', outline=root['bg'])

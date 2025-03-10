@@ -12,6 +12,7 @@ class Object:
     self.root = root
     self.is_static = is_static
     self.collision_enabled = False
+    self.collision_ignore_list = []
     self.transform = Transform(self)
     super().__init__()
 
@@ -57,6 +58,8 @@ class Object:
     
   def _collision_check(self, other):
     if not self.collision_enabled or not other.collision_enabled: return None
+    if other.name in self.collision_ignore_list: return None
+    if self.name in other.collision_ignore_list: return None
     did_collide = False
     if self.transform.position.x < other.transform.position.x + other.transform.width and \
        self.transform.position.x + self.transform.width > other.transform.position.x and \
@@ -94,7 +97,8 @@ class Object:
     col_vec = self.transform.position - self.transform.last_position
 
     collision_response = col_normal * col_vec.magnitude
-    # print(f"Base Collision: {col_normal} with {other_object.name}; Response: {collision_response}")
+    # print(f"Base Collision: {col_normal} with {other_object.name}; {self.transform.position} {other_object.transform.position}") 
+    # print(f"Base Collision: {col_normal} with {other_object.name}; Response: {collision_response} {self.transform.position} {other_object.transform.position}") 
     self.transform.position = self.transform.position + collision_response
 
     super().on_collision(col_normal, col_vec, other_object) if hasattr(super(), 'on_collision') else None

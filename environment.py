@@ -5,10 +5,12 @@ from utils import Vector2
 
 class Environment:
   def __init__(self):
+    size = pyautogui.size()
+
     self.x = 0
     self.y = 0
-    self.width = 1440 # 1980
-    self.height = 900 # 1080
+    self.width = size.width # 1980
+    self.height = size.height # 1080
     self.objects = np.array([])
 
   @property

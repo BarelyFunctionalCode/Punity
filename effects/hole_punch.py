@@ -28,6 +28,8 @@ class HolePunch(Object):
     # Initialize base Tkinter window
     root = invis_tk(tk.Toplevel(parent))
     name = f"hole_punch_{id(self)}"
+    root.title(name)
+    root.geometry(f"0x0+{x}+{y}")
 
     # Create the hole object
     self.hole = Hole(root, hole_polygon, x, y, lifetime)

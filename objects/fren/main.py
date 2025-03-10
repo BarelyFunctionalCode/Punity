@@ -8,14 +8,31 @@ from ..object import Object
 from components.movement import Movement
 from components.rigidbody import Rigidbody
 
+from . import actions
+
 from utils import invis_tk
 
 class Fren(Object, Movement, Rigidbody):
-  def __init__(self, name, parent, x=0, y=0):
+  def __init__(self, parent, entrance=None):
+    name = f"fren_{id(self)}"
+    self.name = name
+    # self.face_polygon =  [50,30, 150,30, 170,50, 175,120, 150,170, 120,190, 80,190, 50,170, 25,120, 30,50, 50,30,]
+    # face_polygon with -30 to all values
+    self.face_polygon = [20,0, 120,0, 140,20, 145,90, 120,140, 90,160, 50,160, 20,140, -5,90, 0,20, 20,0,]
+
+    x = 200
+    y = 200
+    self.entrance = None
+    if entrance in actions.entrances:
+      self.entrance = actions.entrances[entrance](parent, self)
+      x = self.entrance.spawn_position.x
+      y = self.entrance.spawn_position.y
+
+
     # Initialize base Tkinter window
     root = invis_tk(tk.Toplevel(parent))
     root.title(name)
-    root.geometry(f"200x200+{x}+{y}")
+    root.geometry(f"140x170+{x}+{y}")
 
     root.update_idletasks()
 
@@ -26,15 +43,20 @@ class Fren(Object, Movement, Rigidbody):
     self.terminal_despawn_timer = 0
     self.terminal_despawn_timeout = 5000
 
-    self.face = TkinterFace(root)
+    self.face = TkinterFace(root, self.face_polygon)
     self.terminal = None
     self.terminal_update_queue = Queue()
     super().__init__(name, root, False)
 
+    if self.entrance:
+      self.entrance.post_fren_spawn()
+
   def start(self):
     super().start() if hasattr(super(), 'start') else None
     self.use_gravity = False
-    self.set_face_expression("slow_scan")
+
+    if self.entrance:
+      self.entrance.trigger(self)
 
     self.root.after(8000, lambda: self.enqueue_update_text("I make big shid, and I'm not sorry.\n\n\n💩"))
 
