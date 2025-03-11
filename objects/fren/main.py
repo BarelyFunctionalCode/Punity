@@ -1,11 +1,12 @@
 from queue import Queue
 
 from .face import TkinterFace
-from .terminal import TkinterTerminal
+from ..terminal import Terminal
 
 from ..object import Object
 from components.movement import Movement
 from components.rigidbody import Rigidbody
+from utils import Vector2
 
 from . import actions
 
@@ -61,7 +62,7 @@ class Fren(Object, Movement, Rigidbody):
         self.inactivity_timer += self.delta_time
 
       if self.terminal and self.terminal_despawn_timer > self.terminal_despawn_timeout:
-        self.terminal.destroy()
+        self.terminal.start_destroy()
       if not self.terminal and self.inactivity_timer > self.inactivity_timeout:
         self.is_active = False
         self.face.set_face_expression("sleep")
@@ -74,7 +75,8 @@ class Fren(Object, Movement, Rigidbody):
         self.is_active = True
         self.is_waking_up = False
         if not self.terminal and not self.terminal_update_queue.empty():
-          self.terminal = TkinterTerminal(self, self.terminal_update_queue, self.face.talking_queue)
+          terminal_position = self.transform.position.astype(int) - Vector2([0, 100])
+          self.terminal = Terminal(self.tk_obj, terminal_position.x, terminal_position.y, self.terminal_update_queue, self.face.talking_queue)
 
     if self.face.is_asleep and self.move_mode != 'sleep':
       self.set_move_mode('sleep')
@@ -87,7 +89,8 @@ class Fren(Object, Movement, Rigidbody):
   def enqueue_update_text(self, text):
     self.terminal_update_queue.put(text)
     if not self.terminal:
-      self.terminal = TkinterTerminal(self, self.terminal_update_queue, self.face.talking_queue)
+      terminal_position = self.transform.position.astype(int) - Vector2([0, 100])
+      self.terminal = Terminal(self.tk_obj, terminal_position.x, terminal_position.y, self.terminal_update_queue, self.face.talking_queue)
 
   # Used by the assistant to set the face expression
   def set_face_expression(self, expression):
