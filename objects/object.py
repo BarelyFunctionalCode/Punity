@@ -20,6 +20,7 @@ class Object:
     self.collision_enabled = False
     self.collision_ignore_list = []
     self.transform = Transform(self)
+    self.paused = environment.paused
     super().__init__()
 
     self.last_update_time = time.time()
@@ -33,21 +34,22 @@ class Object:
     return (time.time() - self.last_update_time) * 1000
     
   def _update(self):
-    if self.tk_obj == None: return
-    self.update()
-    if self.tk_obj == None: return
-    if not self.is_static:
-      for obj in environment.objects:
-        if obj == self: continue
-        col_normal = self._collision_check(obj)
-        if col_normal != None:
-          self.on_collision(col_normal, obj)
-          if not obj.is_static:
-            obj.on_collision(-col_normal, self)
+    if not self.paused:
+      if self.tk_obj == None: return
+      self.update()
+      if self.tk_obj == None: return
+      if not self.is_static:
+        for obj in environment.objects:
+          if obj == self: continue
+          col_normal = self._collision_check(obj)
+          if col_normal != None:
+            self.on_collision(col_normal, obj)
+            if not obj.is_static:
+              obj.on_collision(-col_normal, self)
 
-      new_position = self.transform.position.astype(Vector2.int)
-      self.tk_obj.update_idletasks()
-      self.tk_obj.geometry(f"{self.transform.width}x{self.transform.height}+{new_position.x}+{new_position.y}")
+        new_position = self.transform.position.astype(Vector2.int)
+        self.tk_obj.update_idletasks()
+        self.tk_obj.geometry(f"{self.transform.width}x{self.transform.height}+{new_position.x}+{new_position.y}")
     self.last_update_time = time.time()
     self.tk_obj.after(10, self._update)
 
