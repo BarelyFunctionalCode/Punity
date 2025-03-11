@@ -35,12 +35,12 @@ class Fren(Object, Movement, Rigidbody):
     self.terminal = None
     self.terminal_update_queue = Queue()
 
-    self.face = TkinterFace(self.root, [20,0, 120,0, 140,20, 145,90, 120,140, 90,160, 50,160, 20,140, -5,90, 0,20, 20,0,])
+    self.face = TkinterFace(self.tk_obj, [20,0, 120,0, 140,20, 145,90, 120,140, 90,160, 50,160, 20,140, -5,90, 0,20, 20,0,])
 
     if self.entrance:
       self.entrance = self.entrance(self.parent, self)
 
-    self.root.after(8000, lambda: self.enqueue_update_text("I make big shid, and I'm not sorry.\n\n\n💩"))
+    self.tk_obj.after(8000, lambda: self.enqueue_update_text("I make big shid, and I'm not sorry.\n\n\n💩"))
 
 
   def update(self):

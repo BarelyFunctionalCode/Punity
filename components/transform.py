@@ -3,10 +3,10 @@ from utils import Vector2
 class Transform:
   def __init__(self, object):
     self.object = object
-    self._position = Vector2([self.object.root.winfo_x(), self.object.root.winfo_y()])
+    self._position = Vector2([self.object.tk_obj.winfo_x(), self.object.tk_obj.winfo_y()])
     self._last_position = Vector2(self._position)
-    self._width = self.object.root.winfo_width()
-    self._height = self.object.root.winfo_height()
+    self._width = self.object.tk_obj.winfo_width()
+    self._height = self.object.tk_obj.winfo_height()
 
   @property
   def position(self):

@@ -56,11 +56,11 @@ class ScreenChunk(Object):
     # Take screenshot of the screen chunk
     screenshot = pyautogui.screenshot(region=(x, y, width, height))
     # Make empty canvas
-    self.graphic_canvas = tk.Canvas(self.root, bg=self.root['bg'], width=width, height=height, bd=0, highlightthickness=0, cursor='none')
-    # self.graphic_canvas = tk.Canvas(root, bg=root['bg'], width=width, height=height, bd=3, highlightthickness=3, cursor='none', highlightbackground='red')
+    self.graphic_canvas = tk.Canvas(self.tk_obj, bg=self.tk_obj['bg'], width=width, height=height, bd=0, highlightthickness=0, cursor='none')
+    # self.graphic_canvas = tk.Canvas(tk_obj, bg=tk_obj['bg'], width=width, height=height, bd=3, highlightthickness=3, cursor='none', highlightbackground='red')
     self.graphic_canvas.pack(padx=0, pady=0, side=tk.TOP)
     # Apply the mask to the screenshot
-    self.graphic_canvas.create_polygon(self.polygon, fill='black', outline=self.root['bg'], width=0)
+    self.graphic_canvas.create_polygon(self.polygon, fill='black', outline=self.tk_obj['bg'], width=0)
     self.chunk_image = ImageTk.PhotoImage(screenshot)
     self.graphic_canvas.create_image(0, 0, image=self.chunk_image, anchor=tk.NW)
 
@@ -73,9 +73,9 @@ class ScreenChunk(Object):
       return
     self.lifetime_timer += self.delta_time
     if self.lifetime_timer > self.lifetime:
-      if self.root.wm_attributes("-alpha") > 0.0:
-        self.root.wm_attributes("-alpha", self.root.wm_attributes("-alpha") - 0.05)
-        self.root.after(50, self.update)
+      if self.tk_obj.wm_attributes("-alpha") > 0.0:
+        self.tk_obj.wm_attributes("-alpha", self.tk_obj.wm_attributes("-alpha") - 0.05)
+        self.tk_obj.after(50, self.update)
         return
       self.destroy()
       return

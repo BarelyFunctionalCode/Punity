@@ -32,9 +32,9 @@ class HolePunch(Object):
   def start(self):
     super().start() if hasattr(super(), 'start') else None
     # Create the hole object
-    self.hole = Hole(self.root, self.hole_polygon, self.transform.position.x, self.transform.position.y, self.lifetime)
+    self.hole = Hole(self.tk_obj, self.hole_polygon, self.transform.position.x, self.transform.position.y, self.lifetime)
     # Create the screen chunk object
-    self.screen_chunk = ScreenChunkRigidbody(self.root, self.hole_polygon, self.transform.position.x, self.transform.position.y, self.lifetime if self.collision_enabled else -1, self.collision_enabled)
+    self.screen_chunk = ScreenChunkRigidbody(self.tk_obj, self.hole_polygon, self.transform.position.x, self.transform.position.y, self.lifetime if self.collision_enabled else -1, self.collision_enabled)
 
 
   def update(self):
@@ -43,10 +43,10 @@ class HolePunch(Object):
       self.screen_chunk.destroy()
       self.screen_chunk = None
 
-    if self.screen_chunk and self.screen_chunk.root == None:
+    if self.screen_chunk and self.screen_chunk.tk_obj == None:
       self.screen_chunk = None
 
-    if self.hole and self.hole.root == None:
+    if self.hole and self.hole.tk_obj == None:
       self.hole = None
 
     if self.screen_chunk == None and self.hole == None:

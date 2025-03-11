@@ -6,19 +6,19 @@ import datetime as date
 from .expressions import expressions
 
 class TkinterFace:
-  def __init__(self, root, face_polygon):
-    self.root = root
+  def __init__(self, tk_obj, face_polygon):
+    self.tk_obj = tk_obj
     self.face_polygon = face_polygon
     self.is_active = False
     self.is_enabled = True
 
     self.is_asleep = False
 
-    self.width = root.winfo_width()
-    self.height = root.winfo_height()
+    self.width = tk_obj.winfo_width()
+    self.height = tk_obj.winfo_height()
 
     # Canvas for drawing face
-    self.graphic_canvas = tk.Canvas(self.root, width=self.width, height=self.height, bg=self.root['bg'], bd=0, highlightthickness=0, cursor='none')
+    self.graphic_canvas = tk.Canvas(self.tk_obj, width=self.width, height=self.height, bg=self.tk_obj['bg'], bd=0, highlightthickness=0, cursor='none')
     self.graphic_canvas.pack(padx=0, pady=0, side=tk.TOP)
 
     # Face Parameters
@@ -128,7 +128,7 @@ class TkinterFace:
     if self.is_enabled and not self.talking_queue.empty():
       self.face_parameters["mouth_open_factor"]["target_value"] = self.talking_queue.get()
     
-    self.root.after(50, self.update_mouth)
+    self.tk_obj.after(50, self.update_mouth)
 
   # Loop for updating the face
   def update(self):
@@ -279,4 +279,4 @@ class TkinterFace:
       self.graphic_canvas.coords(self.mouth, mouth_line)
       
     # Repeat update loop every 10ms
-    self.root.after(10, self.update)
+    self.tk_obj.after(10, self.update)

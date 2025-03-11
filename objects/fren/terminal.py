@@ -6,12 +6,12 @@ class TkinterTerminal:
   def __init__(self, parent_obj, update_queue, talking_queue):
     parent_position = parent_obj.transform.position.astype(int)
 
-    self.root = invis_tk(tk.Toplevel(parent_obj.root))
-    self.root.title(f'{parent_obj.root.title()} Terminal')
-    self.root.geometry(f"300x100+{parent_position[0]}+{parent_position[1] - 100}")
-    self.root.wm_attributes("-alpha", 0.0)
+    self.tk_obj = invis_tk(tk.Toplevel(parent_obj.tk_obj))
+    self.tk_obj.title(f'{parent_obj.tk_obj.title()} Terminal')
+    self.tk_obj.geometry(f"300x100+{parent_position[0]}+{parent_position[1] - 100}")
+    self.tk_obj.wm_attributes("-alpha", 0.0)
 
-    self.root.update_idletasks()
+    self.tk_obj.update_idletasks()
 
     self.update_queue = update_queue
     self.talking_queue = talking_queue
@@ -24,7 +24,7 @@ class TkinterTerminal:
     self.terminal_text_output_index = 0
 
     # Terminal for text output
-    self.frame = tk.Frame(self.root, bg="black", cursor='none')
+    self.frame = tk.Frame(self.tk_obj, bg="black", cursor='none')
     self.frame.pack(fill=tk.BOTH, padx=0, pady=(0,0), side=tk.BOTTOM)
 
     self.terminal_text = tk.Text(self.frame, state='disabled', wrap='word', bg="black", fg="green", font=("Courier", 10), borderwidth=0, highlightthickness=0, insertbackground="green")
@@ -45,18 +45,18 @@ class TkinterTerminal:
   def update(self):
     # Fade out terminal
     if self.do_destroy:
-      if self.root.wm_attributes("-alpha") > 0.0:
-        self.root.wm_attributes("-alpha", self.root.wm_attributes("-alpha") - 0.05)
-        self.root.after(50, self.update)
+      if self.tk_obj.wm_attributes("-alpha") > 0.0:
+        self.tk_obj.wm_attributes("-alpha", self.tk_obj.wm_attributes("-alpha") - 0.05)
+        self.tk_obj.after(50, self.update)
         return
-      self.root.destroy()
+      self.tk_obj.destroy()
       self.is_destroyed = True
       return
 
     # Fade in terminal
-    if self.root.wm_attributes("-alpha") < 1.0:
-      self.root.wm_attributes("-alpha", self.root.wm_attributes("-alpha") + 0.05)
-      self.root.after(50, self.update)
+    if self.tk_obj.wm_attributes("-alpha") < 1.0:
+      self.tk_obj.wm_attributes("-alpha", self.tk_obj.wm_attributes("-alpha") + 0.05)
+      self.tk_obj.after(50, self.update)
       return
     
     # Update text output from queue
@@ -91,9 +91,9 @@ class TkinterTerminal:
   
     # Longer delay after new line
     if new_line:
-      self.root.after(1000, self.update)
+      self.tk_obj.after(1000, self.update)
     else:
-      self.root.after(50, self.update)
+      self.tk_obj.after(50, self.update)
 
   # Blinking cursor following text output
   def blink_cursor(self):
@@ -104,4 +104,4 @@ class TkinterTerminal:
         foreground="black" if self.terminal_text.tag_cget("cursor", "foreground") == "green" else "green"
       )
       self.terminal_text.config(state='disabled')
-    self.root.after(500, self.blink_cursor)
+    self.tk_obj.after(500, self.blink_cursor)

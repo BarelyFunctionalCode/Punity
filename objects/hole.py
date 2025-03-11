@@ -21,10 +21,10 @@ class Hole(Object):
   def start(self):
     super().start() if hasattr(super(), 'start') else None
     # Make empty canvas
-    self.graphic_canvas = tk.Canvas(self.root, width=self.transform.width, height=self.transform.height, bg=self.root['bg'], bd=0, highlightthickness=0, cursor='none')
+    self.graphic_canvas = tk.Canvas(self.tk_obj, width=self.transform.width, height=self.transform.height, bg=self.tk_obj['bg'], bd=0, highlightthickness=0, cursor='none')
     self.graphic_canvas.pack(padx=0, pady=0, side=tk.TOP)
     # Draw hole polygon
-    self.graphic_canvas.create_polygon(self.hole_polygon, fill='black', outline=self.root['bg'])
+    self.graphic_canvas.create_polygon(self.hole_polygon, fill='black', outline=self.tk_obj['bg'])
     self.lifetime_timer = 0
 
 
@@ -34,9 +34,9 @@ class Hole(Object):
       return
     self.lifetime_timer += self.delta_time
     if self.lifetime_timer > self.lifetime:
-      if self.root.wm_attributes("-alpha") > 0.0:
-        self.root.wm_attributes("-alpha", self.root.wm_attributes("-alpha") - 0.05)
-        self.root.after(50, self.update)
+      if self.tk_obj.wm_attributes("-alpha") > 0.0:
+        self.tk_obj.wm_attributes("-alpha", self.tk_obj.wm_attributes("-alpha") - 0.05)
+        self.tk_obj.after(50, self.update)
         return
       self.destroy()
       return

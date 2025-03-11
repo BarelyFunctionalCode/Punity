@@ -11,10 +11,10 @@ class Object:
   def __init__(self, parent, name, width, height, x, y, is_static=True):
     self.parent = parent
     self.name = f"{name}_{id(self)}"
-    self.root = invis_tk(tk.Toplevel(parent))
-    self.root.title(self.name)
-    self.root.geometry(f"{width}x{height}+{x}+{y}")
-    self.root.update_idletasks()
+    self.tk_obj = invis_tk(tk.Toplevel(parent))
+    self.tk_obj.title(self.name)
+    self.tk_obj.geometry(f"{width}x{height}+{x}+{y}")
+    self.tk_obj.update_idletasks()
 
     self.is_static = is_static
     self.collision_enabled = False
@@ -33,9 +33,9 @@ class Object:
     return (time.time() - self.last_update_time) * 1000
     
   def _update(self):
-    if self.root == None: return
+    if self.tk_obj == None: return
     self.update()
-    if self.root == None: return
+    if self.tk_obj == None: return
     if not self.is_static:
       for obj in environment.objects:
         if obj == self: continue
@@ -46,10 +46,10 @@ class Object:
             obj.on_collision(-col_normal, self)
 
       new_position = self.transform.position.astype(Vector2.int)
-      self.root.update_idletasks()
-      self.root.geometry(f"{self.transform.width}x{self.transform.height}+{new_position.x}+{new_position.y}")
+      self.tk_obj.update_idletasks()
+      self.tk_obj.geometry(f"{self.transform.width}x{self.transform.height}+{new_position.x}+{new_position.y}")
     self.last_update_time = time.time()
-    self.root.after(10, self._update)
+    self.tk_obj.after(10, self._update)
 
   def start(self):
     super().start() if hasattr(super(), 'start') else None
@@ -58,8 +58,8 @@ class Object:
     super().update() if hasattr(super(), 'update') else None
 
   def destroy(self):
-    self.root.destroy()
-    self.root = None
+    self.tk_obj.destroy()
+    self.tk_obj = None
     environment.objects = np.delete(environment.objects, np.where(environment.objects == self))
     
   def _collision_check(self, other):
