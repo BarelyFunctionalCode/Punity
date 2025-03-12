@@ -6,16 +6,17 @@ import datetime as date
 from .expressions import expressions
 
 class TkinterFace:
-  def __init__(self, tk_obj, face_polygon):
-    self.tk_obj = tk_obj
+  def __init__(self, obj, face_polygon):
+    self.obj = obj
+    self.tk_obj = obj.tk_obj
     self.face_polygon = face_polygon
     self.is_active = False
     self.is_enabled = True
 
     self.is_asleep = False
 
-    self.width = tk_obj.winfo_width()
-    self.height = tk_obj.winfo_height()
+    self.width = self.tk_obj.winfo_width()
+    self.height = self.tk_obj.winfo_height()
 
     # Canvas for drawing face
     self.graphic_canvas = tk.Canvas(self.tk_obj, width=self.width, height=self.height, bg=self.tk_obj['bg'], bd=0, highlightthickness=0, cursor='none')
@@ -86,9 +87,8 @@ class TkinterFace:
 
     self.update_queue = Queue()
     self.talking_queue = Queue()
-
-    self.update()
-    self.update_mouth()
+    self.talking_mouth_delay = 50
+    self.talking_mouth_delay_timer = 0
 
   # Used to set the face expression
   def set_face_expression(self, expression):
@@ -123,15 +123,15 @@ class TkinterFace:
     #   print(np.minimum(parameter_data["current_value"], parameter_data["target_value"]))
     #   print(np.maximum(parameter_data["current_value"], parameter_data["target_value"]))
 
-  def update_mouth(self):
-    # Update mouth open factor from queue
-    if self.is_enabled and not self.talking_queue.empty():
-      self.face_parameters["mouth_open_factor"]["target_value"] = self.talking_queue.get()
-    
-    self.tk_obj.after(50, self.update_mouth)
-
   # Loop for updating the face
   def update(self):
+    # Update mouth open factor from queue
+    if self.talking_mouth_delay_timer > self.talking_mouth_delay and self.is_enabled and not self.talking_queue.empty():
+      self.talking_mouth_delay_timer = 0
+      self.face_parameters["mouth_open_factor"]["target_value"] = self.talking_queue.get()
+    
+    self.talking_mouth_delay_timer += self.obj.delta_time
+
     # Update face parameters from queue
     if not self.update_queue.empty():
       if self.is_enabled or self.is_asleep: self.is_active = True
@@ -277,6 +277,3 @@ class TkinterFace:
       self.graphic_canvas.coords(self.pupils[0], pupil_ovals[0])
       self.graphic_canvas.coords(self.pupils[1], pupil_ovals[1])
       self.graphic_canvas.coords(self.mouth, mouth_line)
-      
-    # Repeat update loop every 10ms
-    self.tk_obj.after(10, self.update)

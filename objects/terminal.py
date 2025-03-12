@@ -83,6 +83,7 @@ class Terminal(Object):
       self.terminal_text_output_index += 1
       self.terminal_text.see(tk.END)
 
+      # TODO: Make a terminal variant that has this code
       # Update talking queue to move the mouth when text is outputting
       if char == " " or new_line:
         self.talking_queue.put(0.0)

@@ -36,17 +36,19 @@ class Fren(Object, Movement, Rigidbody):
     self.terminal = None
     self.terminal_update_queue = Queue()
 
-    self.face = TkinterFace(self.tk_obj, [20,0, 120,0, 140,20, 145,90, 120,140, 90,160, 50,160, 20,140, -5,90, 0,20, 20,0,])
+    self.face = TkinterFace(self, [20,0, 120,0, 140,20, 145,90, 120,140, 90,160, 50,160, 20,140, -5,90, 0,20, 20,0,])
 
     if self.entrance:
       self.entrance = self.entrance(self.parent, self)
 
-    self.tk_obj.after(8000, lambda: self.enqueue_update_text("I make big shid, and I'm not sorry.\n\n\n💩"))
+    self.tk_obj.after(12000, lambda: self.enqueue_update_text("I make big shid, and I'm not sorry.\n\n\n💩"))
 
 
   def update(self):
     super().update() if hasattr(super(), 'update') else None
     if not hasattr(self, 'face'): return
+
+    self.face.update()
 
     if self.terminal and self.terminal.is_destroyed:
       self.terminal = None
@@ -76,7 +78,7 @@ class Fren(Object, Movement, Rigidbody):
         self.is_waking_up = False
         if not self.terminal and not self.terminal_update_queue.empty():
           terminal_position = self.transform.position.astype(int) - Vector2([0, 100])
-          self.terminal = Terminal(self.tk_obj, terminal_position.x, terminal_position.y, self.terminal_update_queue, self.face.talking_queue)
+          self.terminal = Terminal(self, terminal_position.x, terminal_position.y, self.terminal_update_queue, self.face.talking_queue)
 
     if self.face.is_asleep and self.move_mode != 'sleep':
       self.set_move_mode('sleep')
@@ -90,7 +92,7 @@ class Fren(Object, Movement, Rigidbody):
     self.terminal_update_queue.put(text)
     if not self.terminal:
       terminal_position = self.transform.position.astype(int) - Vector2([0, 100])
-      self.terminal = Terminal(self.tk_obj, terminal_position.x, terminal_position.y, self.terminal_update_queue, self.face.talking_queue)
+      self.terminal = Terminal(self, terminal_position.x, terminal_position.y, self.terminal_update_queue, self.face.talking_queue)
 
   # Used by the assistant to set the face expression
   def set_face_expression(self, expression):

@@ -8,10 +8,14 @@ from utils import Vector2, invis_tk
 from environment import Instance as environment
 
 class Object:
-  def __init__(self, parent, name, width, height, x, y, is_static=True):
+  def __init__(self, parent=None, name="root", width=0, height=0, x=0, y=0, is_static=True):
     self.parent = parent
+    self.children = np.array([])
+    if parent != None:
+      parent.children = np.append(parent.children, self)
+
     self.name = f"{name}_{id(self)}"
-    self.tk_obj = invis_tk(tk.Toplevel(parent))
+    self.tk_obj = invis_tk(tk.Toplevel(parent.tk_obj)) if parent != None else invis_tk(tk.Tk())
     self.tk_obj.title(self.name)
     self.tk_obj.geometry(f"{width}x{height}+{x}+{y}")
     self.tk_obj.update_idletasks()
@@ -26,6 +30,9 @@ class Object:
     self.last_update_time = time.time()
 
     environment.objects = np.append(environment.objects, self)
+    if parent == None:
+      environment.root = self
+      return
     self.start()
     self._update()
 
@@ -63,6 +70,11 @@ class Object:
     self.tk_obj.destroy()
     self.tk_obj = None
     environment.objects = np.delete(environment.objects, np.where(environment.objects == self))
+
+  def print_hierarchy(self, depth=0):
+    print(f"{' ' * depth}|{self.name}")
+    for child in self.children:
+      child.print_hierarchy(depth + 1)
     
   def _collision_check(self, other):
     if not self.collision_enabled or not other.collision_enabled: return None
