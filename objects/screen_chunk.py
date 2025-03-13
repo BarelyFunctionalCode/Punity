@@ -66,7 +66,7 @@ class ScreenChunk(Object):
     # Mask screenshot to polygon (Works on Windows)
     screenshot = screenshot.crop((0, 0, width, height))
     mask = Image.new('L', (width, height), 0)
-    ImageDraw.Draw(mask).polygon(self.polygon, outline=255, fill=255)
+    ImageDraw.Draw(mask).polygon(self.polygon, outline=0, fill=255)
     screenshot.putalpha(mask)
     screenshot.save('screenshot.png')
     
