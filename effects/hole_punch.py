@@ -25,7 +25,8 @@ class HolePunch(Object):
   def __init__(self, parent, hole_polygon, x, y, lifetime=-1, collision_enabled=True):
     self.hole_polygon = hole_polygon
     self.lifetime = lifetime
-    self.collision_enabled = collision_enabled
+    print(collision_enabled)
+    self.screen_chunk_collision_enabled = collision_enabled
     super().__init__(parent, 'hole_punch', 0, 0, x, y,True)
 
 
@@ -33,7 +34,7 @@ class HolePunch(Object):
     super().start() if hasattr(super(), 'start') else None
     # Create the hole object
     # Create the screen chunk object
-    self.screen_chunk = ScreenChunkRigidbody(self, self.hole_polygon, self.transform.position.x, self.transform.position.y, self.lifetime if self.collision_enabled else -1, self.collision_enabled)
+    self.screen_chunk = ScreenChunkRigidbody(self, self.hole_polygon, self.transform.position.x, self.transform.position.y, self.lifetime if self.screen_chunk_collision_enabled else -1, self.screen_chunk_collision_enabled)
     self.hole = Hole(self, self.hole_polygon, self.transform.position.x, self.transform.position.y, self.lifetime)
     self.hole.tk_obj.lower(self.screen_chunk.tk_obj)
 

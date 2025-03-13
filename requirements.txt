@@ -2,3 +2,4 @@ numpy
 pillow
 pyautogui
 python-xlib
+shapely

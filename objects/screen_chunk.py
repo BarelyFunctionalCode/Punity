@@ -1,6 +1,7 @@
 import tkinter as tk
 import pyautogui
 from PIL import ImageTk, Image, ImageDraw
+import shapely
 
 from objects.object import Object
 
@@ -36,37 +37,32 @@ class ScreenChunk(Object):
     # Invert the polygon if needed
     if self.invert:
       self.collision_enabled = False
+      # Remove any polygon points that are outside the bounds
       for i in range(len(self.polygon)):
         if i % 2 == 0:
-          self.polygon[i] = self.invert_point.x + self.polygon[i]
+          self.polygon[i] = int(self.invert_point.x) + self.polygon[i]
         else:
-          self.polygon[i] = self.invert_point.y + self.polygon[i]
-      for i in range(0, len(self.polygon), 2):
-        if self.polygon[i] < 0:
-          self.polygon[i] = 0
-        if self.polygon[i] > width:
-          self.polygon[i] = width
-      for i in range(1, len(self.polygon), 2):
-        if self.polygon[i] < 0:
-          self.polygon[i] = 0
-        if self.polygon[i] > height:
-          self.polygon[i] = height
-      self.polygon = [*[0,0, 0,height, width,height, width,0, 0,0], *self.polygon, *[0,0]]
+          self.polygon[i] = int(self.invert_point.y) + self.polygon[i]
+
+      # Remove the polygon shape from the bounds
+      bounds = shapely.geometry.box(0, 0, width, height)
+      poly = shapely.geometry.Polygon([(self.polygon[i], self.polygon[i+1]) for i in range(0, len(self.polygon), 2)])
+      diff = bounds.difference(poly)
+      self.polygon = list(diff.exterior.coords)
 
     # Take screenshot of the screen chunk
     screenshot = pyautogui.screenshot(region=(x, y, width, height))
     # Make empty canvas
     self.graphic_canvas = tk.Canvas(self.tk_obj, bg=self.tk_obj['bg'], width=width, height=height, bd=0, highlightthickness=0, cursor='none')
-    # self.graphic_canvas = tk.Canvas(tk_obj, bg=tk_obj['bg'], width=width, height=height, bd=3, highlightthickness=3, cursor='none', highlightbackground='red')
     self.graphic_canvas.pack(padx=0, pady=0, side=tk.TOP)
 
     # Apply the mask to the screenshot (Required for MacOS)
-    self.graphic_canvas.create_polygon(self.polygon, fill='black', outline=self.tk_obj['bg'], width=0)
+    self.graphic_canvas.create_polygon(self.polygon, fill='black', outline='black', width=1)
 
     # Mask screenshot to polygon (Works on Windows)
     screenshot = screenshot.crop((0, 0, width, height))
     mask = Image.new('L', (width, height), 0)
-    ImageDraw.Draw(mask).polygon(self.polygon, outline=0, fill=255)
+    ImageDraw.Draw(mask).polygon(self.polygon, outline=255, fill=255)
     screenshot.putalpha(mask)
     
     # convert to ImageTk format
