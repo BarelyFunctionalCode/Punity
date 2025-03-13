@@ -75,6 +75,9 @@ class Object:
     print(f"{' ' * depth}|{self.name}")
     for child in self.children:
       child.print_hierarchy(depth + 1)
+  
+  def toggle_outline(self):
+    Exception("Not Implemented")
     
   def _collision_check(self, other):
     if not self.collision_enabled or not other.collision_enabled: return None
