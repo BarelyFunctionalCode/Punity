@@ -68,7 +68,6 @@ class ScreenChunk(Object):
     mask = Image.new('L', (width, height), 0)
     ImageDraw.Draw(mask).polygon(self.polygon, outline=0, fill=255)
     screenshot.putalpha(mask)
-    screenshot.save('screenshot.png')
     
     # convert to ImageTk format
     self.chunk_image = ImageTk.PhotoImage(screenshot)
