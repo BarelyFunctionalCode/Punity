@@ -59,14 +59,16 @@ class ScreenChunk(Object):
     self.graphic_canvas = tk.Canvas(self.tk_obj, bg=self.tk_obj['bg'], width=width, height=height, bd=0, highlightthickness=0, cursor='none')
     # self.graphic_canvas = tk.Canvas(tk_obj, bg=tk_obj['bg'], width=width, height=height, bd=3, highlightthickness=3, cursor='none', highlightbackground='red')
     self.graphic_canvas.pack(padx=0, pady=0, side=tk.TOP)
-    # Apply the mask to the screenshot
-    # self.graphic_canvas.create_polygon(self.polygon, fill='black', outline=self.tk_obj['bg'], width=0)
 
-    # crop screenshot with polygon using PIL
+    # Apply the mask to the screenshot (Required for MacOS)
+    self.graphic_canvas.create_polygon(self.polygon, fill='black', outline=self.tk_obj['bg'], width=0)
+
+    # Mask screenshot to polygon (Works on Windows)
     screenshot = screenshot.crop((0, 0, width, height))
     mask = Image.new('L', (width, height), 0)
-    ImageDraw.Draw(mask).polygon(self.polygon, outline=1, fill=1)
+    ImageDraw.Draw(mask).polygon(self.polygon, outline=255, fill=255)
     screenshot.putalpha(mask)
+    screenshot.save('screenshot.png')
     
     # convert to ImageTk format
     self.chunk_image = ImageTk.PhotoImage(screenshot)
