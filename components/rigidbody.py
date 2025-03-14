@@ -1,4 +1,5 @@
 from utils import Vector2
+from objects.object import Object
 
 GRAVITY = 3
 
@@ -18,24 +19,28 @@ class Rigidbody:
     super().start() if hasattr(super(), 'start') else None
     self.collision_enabled = True
 
+  # Basic Physics Simulation
   def update(self):
     super().update() if hasattr(super(), 'update') else None
 
+    # Gravity constant acceleration
     if self.use_gravity:
       self.acceleration += Vector2.down * GRAVITY * self.gravity_modifier
 
+    # Calculate velocity based off of acceleration and drag
     self.velocity += self.acceleration
     self.velocity -= self.velocity * self.drag
     self.velocity = Vector2.clamp_magnitude(self.velocity, self.max_speed)
-
     self.transform.position += self.velocity
 
     self.acceleration = Vector2.zero
 
+  # Physics response to collisions
   def on_collision(self, col_normal, _col_vec, _other_object):
     # TODO: Need to take into account the other object's velocity
     super().on_collision(col_normal, _col_vec, _other_object) if hasattr(super(), 'on_collision') else None
     self.velocity = Vector2.reflect(self.velocity, col_normal) * self.bounciness
 
+  # Apply a force to the object (acceleration = force / mass)
   def apply_force(self, force):
     self.acceleration += force / self.mass

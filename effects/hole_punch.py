@@ -10,9 +10,6 @@ class ScreenChunkRigidbody(ScreenChunk, Rigidbody):
   def __init__(self, parent, polygon, x, y, lifetime=-1, collision_enabled=True):
     super().__init__(parent, polygon, x, y, lifetime, False)
     self.collision_enabled = collision_enabled
-
-  def start(self):
-    super().start() if hasattr(super(), 'start') else None
     self.gravity_modifier = 0.5
     self.bounciness = 0.2
 
@@ -25,16 +22,15 @@ class HolePunch(Object):
   def __init__(self, parent, hole_polygon, x, y, lifetime=-1, collision_enabled=True):
     self.hole_polygon = hole_polygon
     self.lifetime = lifetime
-    print(collision_enabled)
     self.screen_chunk_collision_enabled = collision_enabled
     super().__init__(parent, 'hole_punch', 0, 0, x, y,True)
 
 
   def start(self):
     super().start() if hasattr(super(), 'start') else None
-    # Create the hole object
     # Create the screen chunk object
     self.screen_chunk = ScreenChunkRigidbody(self, self.hole_polygon, self.transform.position.x, self.transform.position.y, self.lifetime if self.screen_chunk_collision_enabled else -1, self.screen_chunk_collision_enabled)
+    # Create the hole object
     self.hole = Hole(self, self.hole_polygon, self.transform.position.x, self.transform.position.y, self.lifetime)
     self.hole.tk_obj.lower(self.screen_chunk.tk_obj)
 

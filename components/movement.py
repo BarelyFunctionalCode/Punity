@@ -28,6 +28,7 @@ class Movement:
   ################## Movement Actions ##################
   ######################################################
 
+  # Apply a force to the object to keep it away from the cursor
   def cursor_avoidance(self):
     current_position = self.transform.position
 
@@ -42,9 +43,8 @@ class Movement:
     force = math.trunc(self.normal_move_speed * force_factor)
     self.apply_force(distance.normalized * force)
   
-
+  # Disable gravity and drag and then apply a small force in a random direction
   def sleep_drift(self):
-    # Disable gravity and drag and then apply a small force in a random direction
     self.use_gravity = False
     self.drag = 0.01
     self.apply_force(Vector2.random() * self.asleep_move_speed)

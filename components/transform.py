@@ -1,6 +1,7 @@
 from utils import Vector2
 
 class Transform:
+  # Positional information used to update the TK Windows
   def __init__(self, object):
     self.object = object
     self._position = Vector2([self.object.tk_obj.winfo_x(), self.object.tk_obj.winfo_y()])
@@ -18,17 +19,14 @@ class Transform:
     self._position = new_position
     # print(f"Setting position to {new_position} from {self._last_position}")
 
-
   @property
   def last_position(self):
     return self._last_position
-
 
   @property
   def width(self):
     return self._width
   
-
   @property
   def height(self):
     return self._height

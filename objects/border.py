@@ -21,7 +21,7 @@ class BorderSide(Object):
     self.collision_enabled = True
 
 
-
+# Created objects to represent the border of the screen, which allows for collision detection
 class Border:
   def __init__(self, parent, width, height, x, y, thickness):
     self.top = BorderSide(parent, Side.TOP, width, height, x, y, thickness)

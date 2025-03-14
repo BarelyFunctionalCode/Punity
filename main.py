@@ -23,11 +23,7 @@ if __name__ == "__main__":
   Fren(root, 'hole_punch')
 
 
-  root.print_hierarchy()
+  # root.print_hierarchy()
 
   # Run the main loop
-  try:
-    root.tk_obj.mainloop()
-  except:
-    root.destroy()
-    root = None
+  root.begin()
