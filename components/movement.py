@@ -1,9 +1,10 @@
 import math
 
 from utils import Vector2
+from components.base import Base
 from environment import Instance as environment
 
-class Movement:
+class Movement(Base):
   def __init__(self):
     super().__init__()
     self.proxity_limit = 300
@@ -19,7 +20,7 @@ class Movement:
       self.sleep_drift()
 
   def update(self):
-    super().update() if hasattr(super(), 'update') else None
+    super().update()
     # Depending on the movement mode, get the new desired display position
     if self.move_mode != 'hold': # Always avoid the cursor unless explicitly told not to
       self.cursor_avoidance()

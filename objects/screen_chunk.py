@@ -26,7 +26,7 @@ class ScreenChunk(Object):
     y -= invert_point.y if invert else 0
     super().__init__(parent, 'screen_chunk', width, height, x, y, is_static)
     
-
+  # @Object.shared_method
   def start(self):
     super().start() if hasattr(super(), 'start') else None
     x = int(self.transform.position.x)

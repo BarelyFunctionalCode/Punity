@@ -24,7 +24,7 @@ class Fren(Object, Movement, Rigidbody):
     
 
   def start(self):
-    super().start() if hasattr(super(), 'start') else None
+    super().start()
     self.use_gravity = False
 
     self.is_active = True
@@ -45,7 +45,7 @@ class Fren(Object, Movement, Rigidbody):
 
 
   def update(self):
-    super().update() if hasattr(super(), 'update') else None
+    super().update()
     if not hasattr(self, 'face'): return
 
     self.face.update()

@@ -14,7 +14,7 @@ class ScreenChunkRigidbody(ScreenChunk, Rigidbody):
     self.bounciness = 0.2
 
   def update(self):
-    super().update() if hasattr(super(), 'update') else None
+    super().update()
 
 
 
@@ -27,7 +27,7 @@ class HolePunch(Object):
 
 
   def start(self):
-    super().start() if hasattr(super(), 'start') else None
+    super().start()
     # Create the screen chunk object
     self.screen_chunk = ScreenChunkRigidbody(self, self.hole_polygon, self.transform.position.x, self.transform.position.y, self.lifetime if self.screen_chunk_collision_enabled else -1, self.screen_chunk_collision_enabled)
     # Create the hole object
@@ -36,7 +36,7 @@ class HolePunch(Object):
 
 
   def update(self):
-    super().update() if hasattr(super(), 'update') else None
+    super().update()
     if self.screen_chunk and self.screen_chunk.transform.position.y > environment.height:
       self.screen_chunk.destroy()
       self.screen_chunk = None

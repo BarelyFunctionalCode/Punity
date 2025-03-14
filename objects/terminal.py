@@ -9,9 +9,8 @@ class Terminal(Object):
 
     super().__init__(parent, 'terminal', 300, 100, x, y, True)
 
-
   def start(self):
-    super().start() if hasattr(super(), 'start') else None
+    super().start()
     self.update_delay = 50
     self.update_delay_timer = 0
     self.is_active = False
@@ -41,7 +40,7 @@ class Terminal(Object):
     self.do_destroy = True
 
   def update(self):
-    super().update() if hasattr(super(), 'update') else None
+    super().update()
 
     self.update_delay_timer += self.delta_time
     if self.update_delay_timer < self.update_delay:

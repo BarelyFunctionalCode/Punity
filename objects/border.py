@@ -17,7 +17,7 @@ class BorderSide(Object):
 
 
   def start(self):
-    super().start() if hasattr(super(), 'start') else None
+    super().start()
     self.collision_enabled = True
 
 

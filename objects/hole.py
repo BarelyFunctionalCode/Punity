@@ -17,9 +17,8 @@ class Hole(Object):
     height = max_y - min_y
     super().__init__(parent, "hole", width, height, x, y, True)
 
-
   def start(self):
-    super().start() if hasattr(super(), 'start') else None
+    super().start()
     # Make empty canvas
     self.graphic_canvas = tk.Canvas(self.tk_obj, width=self.transform.width, height=self.transform.height, bg=self.tk_obj['bg'], bd=0, highlightthickness=0, cursor='none')
     self.graphic_canvas.pack(padx=0, pady=0, side=tk.TOP)
@@ -27,9 +26,8 @@ class Hole(Object):
     self.graphic_canvas.create_polygon(self.hole_polygon, fill='black', outline=self.tk_obj['bg'])
     self.lifetime_timer = 0
 
-
   def update(self):
-    super().update() if hasattr(super(), 'update') else None
+    super().update()
     if self.lifetime == -1:
       return
     self.lifetime_timer += self.delta_time

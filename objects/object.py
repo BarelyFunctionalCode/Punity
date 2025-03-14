@@ -2,18 +2,19 @@ import tkinter as tk
 import time
 import numpy as np
 
+from components.base import Base
 from components.transform import Transform
 from utils import Vector2, invis_tk
 
 from environment import Instance as environment
 
-class Object:
-  # def shared_method(func):
-  #   def wrapper(self, *args, **kwargs):
-  #     if hasattr(super(self.__class__), func.__name__):
-  #       getattr(super(self.__class__), func.__name__)(*args, **kwargs)
-  #     func(self, *args, **kwargs)
-  #   return wrapper
+class Object(Base):
+  def shared_method(func):
+    def wrapper(self, *args, **kwargs):
+      if hasattr(super(type(self), self), func.__name__):
+        getattr(super(type(self), self), func.__name__)(*args, **kwargs)
+      func(self, *args, **kwargs)
+    return wrapper
 
   def __init__(self, parent=None, name="root", width=0, height=0, x=0, y=0, is_static=True):
     # Setting the parent and children
@@ -97,10 +98,10 @@ class Object:
 
   # Functions to be extended by derived/sibling classes
   def start(self):
-    super().start() if hasattr(super(), 'start') else None
+    super().start()
 
   def update(self):
-    super().update() if hasattr(super(), 'update') else None
+    super().update()
 
   # Destroys TK Window and removes object from environment
   def destroy(self):
@@ -178,4 +179,4 @@ class Object:
     self.transform.position = self.transform.position + collision_response
 
     # Apply any addition functionality defined in the derived/sibling class
-    super().on_collision(col_normal, col_vec, other_object) if hasattr(super(), 'on_collision') else None
+    super().on_collision(col_normal, col_vec, other_object)
