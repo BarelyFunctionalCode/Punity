@@ -5,6 +5,7 @@ import platform
 
 def invis_tk(root):
   root.overrideredirect(True)
+  root.update_idletasks()
   root.wm_attributes("-topmost", True)
 
   if platform.system() == "Windows":
@@ -15,7 +16,7 @@ def invis_tk(root):
     root.wm_attributes("-transparent", True)
     root.config(bg='systemTransparent')
 
-  root.config(cursor='none')
+  root.config(cursor='arrow')
   root.geometry("0x0+0+0")
 
   return root

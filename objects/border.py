@@ -4,7 +4,7 @@ from utils import Side
 class BorderSide(Object):
   def __init__(self, parent, side: Side, width, height, x, y, thickness):
     if side == Side.TOP:
-      params = [width, thickness, x, y - thickness]
+      params = [width, thickness, x, y - thickness - 25] # Bit of a hacky way to get "above" the taskbar
     elif side == Side.RIGHT:
       params = [thickness, height, x + width, y]
     elif side == Side.BOTTOM:

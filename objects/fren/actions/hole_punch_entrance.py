@@ -30,6 +30,7 @@ class HolePunchEntrance(Object):
 
     # After a second, push Fren out from behind the screen chunk
     self.tk_obj.after(1000, lambda: self.fren.apply_force(Vector2.left * 10))
+    self.tk_obj.after(1300, lambda: self.fren.tk_obj.lift(self.screen_chunk.tk_obj))
     self.tk_obj.after(1500, lambda: self.fren.set_face_expression("slow_scan"))
 
   def update(self):

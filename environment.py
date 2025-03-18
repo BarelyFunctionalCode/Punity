@@ -8,7 +8,7 @@ class Environment:
     size = pyautogui.size()
 
     self.x = 0
-    self.y = 0
+    self.y = 25
     self.width = size.width
     self.height = size.height-25 # TODO: Find a better way to offset the taskbar
     self.paused = False
