@@ -14,7 +14,7 @@ class Hierarchy:
     self.hierarchy.title("Hierarchy")
     self.hierarchy.geometry(f"200x{environment.height}+0+0")
     self.hierarchy.update_idletasks()
-    self.hierarchy.wm_attributes("-alpha", 0.7)
+    self.hierarchy.wm_attributes("-alpha", 0.8)
     self.hierarchy.wm_attributes("-topmost", True)
     self.hierarchy.update_idletasks()
 
@@ -50,11 +50,11 @@ class Hierarchy:
     for obj_name, children in dict.items(): ## SOMETHING IS WRONG HERE
       obj_name = obj_name.lower()
       if obj_name not in self.hierarchy_objs.keys():
-        new_toggle = tk.Label(self.hierarchy, name=obj_name+'_toggle', text='-' if self.force_expand else '+' , width=1, pady=1, anchor='w')
+        new_toggle = tk.Label(self.hierarchy, name=obj_name+'_toggle', text='-' if self.force_expand else '+' , width=1, pady=1, anchor='w', font=('Courier New', 12))
         new_toggle.place(x=5+depth*30, y=self.i*25)
         new_toggle.bind("<Button-1>", self.on_hierarchy_obj_toggle)
 
-        new_obj = tk.Label(self.hierarchy, name=obj_name, text='_'.join(obj_name.split('_')[:-1]), width=20, pady=1, anchor='w', justify=tk.LEFT)
+        new_obj = tk.Label(self.hierarchy, name=obj_name, text='_'.join(obj_name.split('_')[:-1]), width=20, pady=1, anchor='w', justify=tk.LEFT, font=('Courier New', 12))
         new_obj.place(x=20+depth*30, y=self.i*25)
         new_obj.bind("<Button-1>", self.set_active_obj)
 
@@ -95,7 +95,7 @@ class Hierarchy:
   def set_active_obj(self, event):
     if event.widget.winfo_class() == 'Label':
       if self.inspector:
-        self.inspector.update_inspector(event.widget.winfo_name())
+        self.inspector.set_active_object(event.widget.winfo_name())
       for obj_name in self.hierarchy_objs.keys():
         if obj_name == event.widget.winfo_name():
           self.hierarchy_objs[obj_name]['obj'].config(bg='lightblue', foreground='black')

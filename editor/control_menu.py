@@ -15,5 +15,5 @@ class ControlMenu:
     self.controls.wm_attributes("-topmost", True)
     self.controls.update_idletasks()
 
-    self.pause_button = tk.Button(self.controls, width=3, text="Pause", command=environment.pause).grid(row=0, column=0)
-    self.resume_button = tk.Button(self.controls, width=3, text="Resume", command=environment.resume).grid(row=0, column=1)
+    self.pause_button = tk.Button(self.controls, width=3, text="Pause", command=environment.pause, font=('Courier New', 12)).grid(row=0, column=0)
+    self.resume_button = tk.Button(self.controls, width=3, text="Resume", command=environment.resume, font=('Courier New', 12)).grid(row=0, column=1)
