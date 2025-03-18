@@ -9,14 +9,20 @@ class Environment:
 
     self.x = 0
     self.y = 0
-    self.width = size.width # 1980
-    self.height = size.height # 1080
+    self.width = size.width
+    self.height = size.height-25 # TODO: Find a better way to offset the taskbar
     self.paused = False
     self.objects = np.array([])
+    self.root = None
 
   @property
   def mouse_position(self):
     return Vector2(pyautogui.position())
+  
+  def get_object(self, name):
+    for obj in self.objects:
+      if obj.name == name:
+        return obj
   
   def pause(self):
     self.paused = True

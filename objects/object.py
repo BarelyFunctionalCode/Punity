@@ -16,34 +16,33 @@ class Object(Base):
     if parent != None:
       parent.children = np.append(parent.children, self)
 
-    # Setting default TK Window Options
-    self.name = f"{name}_{id(self)}"
-    self.tk_obj = invis_tk(tk.Toplevel(parent.tk_obj)) if parent != None else invis_tk(tk.Tk())
-    self.tk_obj.title(self.name)
-    self.tk_obj.geometry(f"{width}x{height}+{x}+{y}")
-    self.tk_obj.update_idletasks()
-
     # Object speficic variables for movement and collision
     self.is_static = is_static
     self.collision_enabled = False
     self.collision_ignore_list = []
-    self.transform = Transform(self)
     self.paused = environment.paused
+    self.last_update_time = time.time()
+
+    # Setting default TK Window Options
+    self.name = f"{name.lower()}_{id(self)}"
+
+    if parent != None or (parent == None and environment.root == None):
+      self.tk_obj = invis_tk(tk.Toplevel(parent.tk_obj)) if parent != None else invis_tk(tk.Tk())
+      self.tk_obj.title(self.name)
+      self.tk_obj.geometry(f"{width}x{height}+{x}+{y}")
+      self.tk_obj.update_idletasks()
+    else:
+      self.tk_obj = None
+
+    # Setting the transform component
+    if parent != None or (parent == None and environment.root == None):
+      self.transform = Transform(self)
+    else:
+      self.transform = None
+      return
 
     # Init other sibling class instances
     super().__init__()
-
-    # Get the list of subclasses of Product
-    # subclasses = Object.__subclasses__()
-
-    # # Assuming there is at least one subclass, get the first one
-    # if subclasses:
-    #     derived_class = subclasses[0]
-    #     derived_class_name = derived_class.__name__
-    #     print(derived_class_name)  # Output: Book
-    # else:
-    #     print("No subclasses found")
-    # print(self.name)
 
     # Adding object to environment
     environment.objects = np.append(environment.objects, self)
@@ -53,8 +52,7 @@ class Object(Base):
       environment.root = self
       return
     
-    # Initialize delta time, run start function, and start the update loop
-    self.last_update_time = time.time()
+    # Run start function, and start the update loop
     self.start()
     self._update()
 

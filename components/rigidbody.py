@@ -5,11 +5,6 @@ GRAVITY = 3
 
 class Rigidbody(Base):
   def __init__(self):
-    super().__init__()
-
-  def start(self):
-    super().start()
-    self.collision_enabled = True
     self.use_gravity = True
     self.velocity = Vector2.zero
     self.acceleration = Vector2.zero
@@ -18,6 +13,11 @@ class Rigidbody(Base):
     self.mass = 1
     self.bounciness = 1.0
     self.gravity_modifier = 1.0
+    super().__init__()
+
+  def start(self):
+    super().start()
+    self.collision_enabled = True
 
   # Basic Physics Simulation
   def update(self):

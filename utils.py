@@ -78,7 +78,11 @@ class Vector2:
     return np.array_equal(self._vec, other._vec)
   
   def __str__(self):
-    return f"Vector2({self._vec})"
+    x, y = self._vec
+    x = round(x, 1)
+    y = round(y, 1)
+    return f"X: {x} | Y:{y}"
+    # return f"Vector2({self._vec})"
   
   def equals(self, other):
     return self == other

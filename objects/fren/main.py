@@ -20,12 +20,6 @@ class Fren(Object, Movement, Rigidbody):
       self.entrance = actions.entrances[entrance]
       x = self.entrance.spawn_position.x
       y = self.entrance.spawn_position.y
-    super().__init__(parent, 'fren', 140, 170, x, y, False)
-    
-
-  def start(self):
-    super().start()
-    self.use_gravity = False
 
     self.is_active = True
     self.is_waking_up = False
@@ -35,6 +29,12 @@ class Fren(Object, Movement, Rigidbody):
     self.terminal_despawn_timeout = 5000
     self.terminal = None
     self.terminal_update_queue = Queue()
+    self.face = None
+    super().__init__(parent, 'fren', 140, 170, x, y, False)
+    
+  def start(self):
+    super().start()
+    self.use_gravity = False
 
     self.face = TkinterFace(self, [20,0, 120,0, 140,20, 145,90, 120,140, 90,160, 50,160, 20,140, -5,90, 0,20, 20,0,])
 

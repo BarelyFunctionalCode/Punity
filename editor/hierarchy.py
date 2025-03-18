@@ -2,22 +2,12 @@ import tkinter as tk
 
 from environment import Instance as environment
 
-class Editor:
-  def __init__(self, parent, auto_expand=False):
+class Hierarchy:
+  def __init__(self, parent, inspector, force_expand=False):
     self.root_obj = parent.tk_obj
     self.parent = parent
-    self.auto_expand = auto_expand
-    self.controls = tk.Toplevel(self.root_obj)
-    self.controls.overrideredirect(True)
-    self.controls.title("Control Menu")
-    self.controls.geometry(f"125x35+{environment.width // 2 - 100}+0")
-    self.controls.update_idletasks()
-    self.controls.wm_attributes("-alpha", 0.7)
-    self.controls.wm_attributes("-topmost", True)
-    self.controls.update_idletasks()
-
-    self.pause_button = tk.Button(self.controls, width=3, text="Pause", command=environment.pause).grid(row=0, column=0)
-    self.resume_button = tk.Button(self.controls, width=3, text="Resume", command=environment.resume).grid(row=0, column=1)
+    self.inspector = inspector
+    self.force_expand = force_expand
 
     self.hierarchy = tk.Toplevel(self.root_obj)
     self.hierarchy.overrideredirect(True)
@@ -29,10 +19,9 @@ class Editor:
     self.hierarchy.update_idletasks()
 
     self.hierarchy_objs = {}
-    self.hierarchy_active_obj_name_path = []
-
     self.update_hierarchy()
 
+  
   def update_hierarchy(self):
     hierarchy_dict = self.parent.generate_hierarchy()
     self.i = 0
@@ -61,14 +50,15 @@ class Editor:
     for obj_name, children in dict.items(): ## SOMETHING IS WRONG HERE
       obj_name = obj_name.lower()
       if obj_name not in self.hierarchy_objs.keys():
-        new_toggle = tk.Label(self.hierarchy, name=obj_name+'_toggle', text='-' if self.auto_expand else '+' , width=1, pady=5, anchor='w')
+        new_toggle = tk.Label(self.hierarchy, name=obj_name+'_toggle', text='-' if self.force_expand else '+' , width=1, pady=1, anchor='w')
         new_toggle.place(x=5+depth*30, y=self.i*25)
         new_toggle.bind("<Button-1>", self.on_hierarchy_obj_toggle)
 
-        new_obj = tk.Label(self.hierarchy, name=obj_name, text='_'.join(obj_name.split('_')[:-1]), width=20, pady=5, anchor='w', justify=tk.LEFT)
+        new_obj = tk.Label(self.hierarchy, name=obj_name, text='_'.join(obj_name.split('_')[:-1]), width=20, pady=1, anchor='w', justify=tk.LEFT)
         new_obj.place(x=20+depth*30, y=self.i*25)
+        new_obj.bind("<Button-1>", self.set_active_obj)
 
-        self.hierarchy_objs[obj_name] = {'toggle': new_toggle, 'obj': new_obj, 'expanded': self.auto_expand}
+        self.hierarchy_objs[obj_name] = {'toggle': new_toggle, 'obj': new_obj, 'expanded': self.force_expand}
       else:
         self.hierarchy_objs[obj_name]['toggle'].place(x=5+depth*30, y=self.i*25)
         self.hierarchy_objs[obj_name]['obj'].place(x=20+depth*30, y=self.i*25)
@@ -101,3 +91,16 @@ class Editor:
                 self.hierarchy_objs.pop(child.name.lower())
                 destroy_children(child)
         destroy_children(current_obj)
+
+  def set_active_obj(self, event):
+    if event.widget.winfo_class() == 'Label':
+      if self.inspector:
+        self.inspector.update_inspector(event.widget.winfo_name())
+      for obj_name in self.hierarchy_objs.keys():
+        if obj_name == event.widget.winfo_name():
+          self.hierarchy_objs[obj_name]['obj'].config(bg='lightblue', foreground='black')
+          self.hierarchy_objs[obj_name]['toggle'].config(bg='lightblue', foreground='black')
+        else:
+          self.hierarchy_objs[obj_name]['obj'].config(bg=self.root_obj['bg'], foreground='white')
+          self.hierarchy_objs[obj_name]['toggle'].config(bg=self.root_obj['bg'], foreground='white')
+    self.hierarchy.update_idletasks()

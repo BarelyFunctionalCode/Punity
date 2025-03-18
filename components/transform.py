@@ -30,3 +30,7 @@ class Transform:
   @property
   def height(self):
     return self._height
+  
+  @property
+  def size(self):
+    return Vector2([self._width, self._height])

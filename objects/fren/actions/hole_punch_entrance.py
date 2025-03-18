@@ -42,7 +42,6 @@ class HolePunchEntrance(Object):
       self.screen_chunk = None
 
     if self.hole_punch == None and self.screen_chunk == None:
-      print("Hole Punch Entrance Destroyed")
       self.destroy()
       return
     
