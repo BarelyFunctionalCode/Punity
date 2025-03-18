@@ -9,13 +9,6 @@ from utils import Vector2, invis_tk
 from environment import Instance as environment
 
 class Object(Base):
-  def shared_method(func):
-    def wrapper(self, *args, **kwargs):
-      if hasattr(super(type(self), self), func.__name__):
-        getattr(super(type(self), self), func.__name__)(*args, **kwargs)
-      func(self, *args, **kwargs)
-    return wrapper
-
   def __init__(self, parent=None, name="root", width=0, height=0, x=0, y=0, is_static=True):
     # Setting the parent and children
     self.parent = parent
@@ -107,6 +100,8 @@ class Object(Base):
   def destroy(self):
     self.tk_obj.destroy()
     self.tk_obj = None
+    if self.parent:
+      self.parent.children = np.delete(self.parent.children, np.where(self.parent.children == self))
     environment.objects = np.delete(environment.objects, np.where(environment.objects == self))
 
   # Begins the main loop for the root object
@@ -122,6 +117,13 @@ class Object(Base):
     print(f"{' ' * depth}|{self.name}")
     for child in self.children:
       child.print_hierarchy(depth + 1)
+
+  def generate_hierarchy(self, depth=0):
+    hierarchy = {}
+    hierarchy[self.name] = {}
+    for child in self.children:
+      hierarchy[self.name].update(child.generate_hierarchy(depth + 1))
+    return hierarchy
   
   # Debug function to toggle the outline of the object
   def toggle_outline(self):

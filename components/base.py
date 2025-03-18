@@ -8,5 +8,5 @@ class Base:
   def update(self):
     Exception("Not Implemented")
 
-  def on_collision(self, col_normal, _col_vec, _other_object):
+  def on_collision(self, col_normal, col_vec, other_object):
     Exception("Not Implemented")
