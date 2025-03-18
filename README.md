@@ -5,7 +5,7 @@ Unity, but in Python? Using Tkinter as a graphics base
 # Road to 1.0 demo
 
 - A hole appears after that part of the screen falls away in pieces
-- Fren appears in hole and comes out
+- Fren appears in hole and comes out (done)
 - When a non-fullscreen window is opened, it gets Fren's attention
 - He phases into the window and disappears
 - Period where the window shows various glitches
@@ -17,7 +17,7 @@ Unity, but in Python? Using Tkinter as a graphics base
 ### Features
 
 - Object layer management
-  - Layers: Background, Foreground, Top
+  - Layers: Background, Foreground, Top (done)
 - Program detection and tracking
   - Detect when a new application on the PC is started
   - Keep track of running applications with their window sizes and positions
@@ -25,7 +25,7 @@ Unity, but in Python? Using Tkinter as a graphics base
 
 ### Objects
 
-- Screen Chunk
+- Screen Chunk (done)
   - Layer: Top
   - Inputs: polygon, position
   - Process:
@@ -33,7 +33,7 @@ Unity, but in Python? Using Tkinter as a graphics base
     - Take a screenshot of the screen
     - crop the screenshot based on the polygon
     - Create canvas with an image of the clipped screenshot
-- Hole
+- Hole (done)
   - Layer: Background
   - Inputs: polygon, position, lifespan
   - Process:
