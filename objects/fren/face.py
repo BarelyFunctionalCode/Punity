@@ -117,11 +117,6 @@ class TkinterFace:
       np.minimum(parameter_data["current_value"], parameter_data["target_value"]),
       np.maximum(parameter_data["current_value"], parameter_data["target_value"])
     )
-    # if parameter == "face_position":
-    #   print("#################################")
-    #   print(parameter_data["current_value"], parameter_data["target_value"])
-    #   print(np.minimum(parameter_data["current_value"], parameter_data["target_value"]))
-    #   print(np.maximum(parameter_data["current_value"], parameter_data["target_value"]))
 
   # Loop for updating the face
   def update(self):

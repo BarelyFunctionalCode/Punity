@@ -15,31 +15,27 @@ class Object(Base):
     self.children = np.array([])
     if parent != None:
       parent.children = np.append(parent.children, self)
+    self.name = f"{name.lower()}_{id(self)}"
+    self.tk_obj = None
 
     # Object speficic variables for movement and collision
+    self.transform = None
     self.is_static = is_static
     self.collision_enabled = False
     self.collision_ignore_list = []
     self.paused = environment.paused
     self.last_update_time = time.time()
 
-    # Setting default TK Window Options
-    self.name = f"{name.lower()}_{id(self)}"
+    if parent == None and environment.root != None: return
 
-    if parent != None or (parent == None and environment.root == None):
-      self.tk_obj = invis_tk(tk.Toplevel(parent.tk_obj)) if parent != None else invis_tk(tk.Tk())
-      self.tk_obj.title(self.name)
-      self.tk_obj.geometry(f"{width}x{height}+{x}+{y}")
-      self.tk_obj.update_idletasks()
-    else:
-      self.tk_obj = None
+    # Setting default TK Window Options
+    self.tk_obj = invis_tk(tk.Toplevel(parent.tk_obj)) if parent != None else invis_tk(tk.Tk())
+    self.tk_obj.title(self.name)
+    self.tk_obj.geometry(f"{width}x{height}+{x}+{y}")
+    self.tk_obj.update_idletasks()
 
     # Setting the transform component
-    if parent != None or (parent == None and environment.root == None):
-      self.transform = Transform(self)
-    else:
-      self.transform = None
-      return
+    self.transform = Transform(self)
 
     # Init other sibling class instances
     super().__init__()
@@ -47,11 +43,6 @@ class Object(Base):
     # Adding object to environment
     environment.objects = np.append(environment.objects, self)
 
-    # Setting the root object
-    if parent == None:
-      environment.root = self
-      return
-    
     # Run start function, and start the update loop
     self.start()
     self._update()
@@ -101,14 +92,6 @@ class Object(Base):
     if self.parent:
       self.parent.children = np.delete(self.parent.children, np.where(self.parent.children == self))
     environment.objects = np.delete(environment.objects, np.where(environment.objects == self))
-
-  # Begins the main loop for the root object
-  def begin(self):
-    if self.parent: return
-    try:
-      self.tk_obj.mainloop()
-    except:
-      self.destroy()
 
   # Debug function to print the hierarchy of the objects in the environment
   def print_hierarchy(self, depth=0):

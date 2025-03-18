@@ -1,23 +1,13 @@
-from environment import Instance as environment
-
-from objects.object import Object
+from objects.scene import Scene
 from objects.fren import Fren
-from objects.border import Border
-from editor import Editor
 
 if __name__ == "__main__":
 
   # Root object for all other objects to spawn from
-  root = Object()
-
-  # Create the border objects for the screen
-  Border(root, environment.width, environment.height, environment.x, environment.y, 50)
+  scene = Scene(True)
 
   # Create the fren object
-  Fren(root, 'hole_punch')
-
-  # Create the editor
-  Editor(root, True)
+  Fren(scene, 'hole_punch')
 
   # Run the main loop
-  root.begin()
+  scene.begin()
