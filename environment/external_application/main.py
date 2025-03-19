@@ -7,7 +7,9 @@ else:
   from .macos import get_applications
 
 class ExternalApplication:
-  def __init__(self, title, size, position):
+  def __init__(self, pid, name, title, size, position):
+    self.pid = pid
+    self.name = name
     self.title = title
     self.position = position
     self.size = size
@@ -17,21 +19,22 @@ class ExternalApplication:
 def update_applications(applications):
   current_applications = get_applications()
   for app in current_applications:
-    if app['title'] not in applications:
+    if app['pid'] not in applications:
       # Create the application if it doesn't exist
-      applications[app['title']] = ExternalApplication(app['title'], app['size'], app['position'])
-      print(f'\"{app['title']}\" created at {applications[app['title']].position} with size {applications[app['title']].size}')
+      applications[app['pid']] = ExternalApplication(**app)
+      # print(f'\"{app['name']}\" created at {applications[app['pid']].position} with size {applications[app['pid']].size} and pid {applications[app['pid']].pid} ({applications[app['pid']].title})')
     else:
       # Update the application if it does exist
-      if app['position'] != applications[app['title']].position or app['size'] != applications[app['title']].size:
-        applications[app['title']].last_update = time.time()
-        print(f'\"{app['title']}\" moved to {app['position']} with size {app['size']}')
+      if app['position'] != applications[app['pid']].position or app['size'] != applications[app['pid']].size or app['title'] != applications[app['pid']].title:
+        applications[app['pid']].last_update = time.time()
+        # print(f'\"{app['name']}\" moved to {app['position']} with size {app['size']} ({app['title']})')
 
-      applications[app['title']].position = app['position']
-      applications[app['title']].size = app['size']
+      applications[app['pid']].position = app['position']
+      applications[app['pid']].size = app['size']
+      applications[app['pid']].title = app['title']
 
   # Delete applications that are no longer open
-  application_titles = [app['title'] for app in current_applications]
+  application_titles = [app['pid'] for app in current_applications]
   delete_keys = []
   for app in applications.keys():
     if app not in application_titles:

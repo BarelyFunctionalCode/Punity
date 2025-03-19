@@ -23,15 +23,11 @@ class Terminal(Object):
 
     # Terminal for text output
     self.frame = tk.Frame(self.tk_obj, bg="black", cursor='none')
-    self.frame.pack(fill=tk.BOTH, padx=0, pady=(0,0), side=tk.BOTTOM)
-    self.terminal_text = tk.Text(self.frame, state='disabled', wrap='word', bg="black", fg="green", font=("Courier", 10), borderwidth=0, highlightthickness=0, insertbackground="green")
-    self.terminal_text.pack(padx=10, pady=10)
+    self.frame.pack(fill=tk.BOTH, padx=0, pady=(0,0), side=tk.BOTTOM, expand=True)
+    self.terminal_text = tk.Message(self.frame, bg="black", fg="green", font=("Courier New", 12), borderwidth=0, highlightthickness=0, justify=tk.LEFT, width=280, anchor=tk.NW)
+    self.terminal_text.pack(side=tk.TOP, padx=10, pady=10, fill=tk.BOTH, expand=True)
 
-    # Add blinking cursor
-    self.terminal_text.config(state='normal')
-    self.terminal_text.insert(tk.END, "_")
-    self.terminal_text.tag_add("cursor", "1.0")
-    self.terminal_text.config(state='disabled')
+    self.terminal_text.config(text="_")
 
     self.update()
     self.blink_cursor()
@@ -74,13 +70,11 @@ class Terminal(Object):
       
       # Add new character to text object
       char = self.terminal_text_output[self.terminal_text_output_index]
-      self.terminal_text.config(state='normal')
-      self.terminal_text.insert("end-2c", char)
-      self.terminal_text.config(state='disabled')
+      current_cursor = self.terminal_text.cget('text')[-1]
+      self.terminal_text.config(text=self.terminal_text_output[:self.terminal_text_output_index+1] + current_cursor)
       if char == "\n" or ((char == "." or char == "?" or char == "!") and char != self.terminal_text_output[min(self.terminal_text_output_index - 1, 0)]):
         new_line = True
       self.terminal_text_output_index += 1
-      self.terminal_text.see(tk.END)
 
       # TODO: Make a terminal variant that has this code
       # Update talking queue to move the mouth when text is outputting
@@ -100,11 +94,7 @@ class Terminal(Object):
 
   # Blinking cursor following text output
   def blink_cursor(self):
-    if "cursor" in self.terminal_text.tag_names():
-      self.terminal_text.config(state='normal')
-      self.terminal_text.tag_config(
-        "cursor",
-        foreground="black" if self.terminal_text.tag_cget("cursor", "foreground") == "green" else "green"
-      )
-      self.terminal_text.config(state='disabled')
+    current_output = self.terminal_text.cget('text')
+    current_output = current_output[:-1] + (" " if current_output[-1] == "_" else "_")
+    self.terminal_text.config(text=current_output)
     self.tk_obj.after(500, self.blink_cursor)

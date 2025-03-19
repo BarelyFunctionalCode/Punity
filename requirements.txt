@@ -4,3 +4,4 @@ pyautogui
 python-xlib
 shapely
 pywinctl
+py2app
