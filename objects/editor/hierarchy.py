@@ -1,6 +1,6 @@
 import tkinter as tk
 
-from environment import Instance as environment
+from environment import environment
 
 class Hierarchy:
   def __init__(self, parent, inspector, force_expand=False):

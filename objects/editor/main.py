@@ -1,6 +1,6 @@
 import tkinter as tk
 
-from environment import Instance as environment
+from environment import environment
 
 from .control_menu import ControlMenu
 from .inspector import Inspector

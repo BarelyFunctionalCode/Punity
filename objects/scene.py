@@ -2,7 +2,7 @@ from .object import Object
 from .border import Border
 from .editor import Editor
 
-from environment import Instance as environment
+from environment import environment
 
 class Scene(Object):
   def __init__(self, create_editor=False):

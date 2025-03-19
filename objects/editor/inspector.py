@@ -1,7 +1,7 @@
 import tkinter as tk
 import types
 
-from environment import Instance as environment
+from environment import environment
 
 class_blacklist = ['Object', 'Base']
 

@@ -4,7 +4,7 @@ from objects.screen_chunk import ScreenChunk
 
 from components.rigidbody import Rigidbody
 
-from environment import Instance as environment
+from environment import environment
 
 class ScreenChunkRigidbody(ScreenChunk, Rigidbody):
   def __init__(self, parent, polygon, x, y, lifetime=-1, collision_enabled=True):

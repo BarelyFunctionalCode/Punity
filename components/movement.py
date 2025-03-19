@@ -2,7 +2,7 @@ import math
 
 from utils import Vector2
 from components.base import Base
-from environment import Instance as environment
+from environment import environment
 
 class Movement(Base):
   def __init__(self):
