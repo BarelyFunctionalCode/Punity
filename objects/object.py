@@ -30,7 +30,7 @@ class Object(Base):
 
     # Setting default TK Window Options
     self.tk_obj = invis_tk(tk.Toplevel(parent.tk_obj)) if parent != None else invis_tk(tk.Tk())
-    self.tk_obj.title(self.name)
+    self.tk_obj.title(f"punity_{self.name}")
     self.tk_obj.geometry(f"{width}x{height}+{x}+{y}")
     self.tk_obj.update_idletasks()
 

@@ -11,7 +11,7 @@ class Hierarchy:
 
     self.hierarchy = tk.Toplevel(self.root_obj)
     self.hierarchy.overrideredirect(True)
-    self.hierarchy.title("Hierarchy")
+    self.hierarchy.title("punity_hierarchy")
     self.hierarchy.geometry(f"200x{environment.height}+0+0")
     self.hierarchy.update_idletasks()
     self.hierarchy.wm_attributes("-alpha", 0.8)

@@ -3,3 +3,4 @@ pillow
 pyautogui
 python-xlib
 shapely
+pywinctl

@@ -8,7 +8,7 @@ class ControlMenu:
     self.parent = parent
     self.controls = tk.Toplevel(self.root_obj)
     self.controls.overrideredirect(True)
-    self.controls.title("Control Menu")
+    self.controls.title("punity_control_menu")
     self.controls.geometry(f"125x35+{environment.width // 2 - 100}+0")
     self.controls.update_idletasks()
     self.controls.wm_attributes("-alpha", 0.7)

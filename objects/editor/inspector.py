@@ -12,7 +12,7 @@ class Inspector:
 
     self.inspector = tk.Toplevel(self.root_obj)
     self.inspector.overrideredirect(True)
-    self.inspector.title("Hierarchy")
+    self.inspector.title("punity_inspector")
     self.inspector.geometry(f"300x{environment.height}+{environment.width - 300}+0")
     self.inspector.update_idletasks()
     self.inspector.wm_attributes("-alpha", 0.8)
