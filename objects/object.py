@@ -37,6 +37,12 @@ class Object(Base):
     # Setting the transform component
     self.transform = Transform(self)
 
+    self.is_faded = False
+    self._is_fading = False
+    self.fade_step = 0.05
+    self.fade_step_delay = 50
+    self._fade_step_timer = 0
+
     # Init other sibling class instances
     super().__init__()
 
@@ -55,8 +61,26 @@ class Object(Base):
   # Update loop for the object
   def _update(self):
     if not self.paused:
-      # Run update functionality for derived class and sibling classes
       if self.tk_obj == None: return
+      # Fading logic
+      if self._is_fading and self._fade_step_timer < self.fade_step_delay:
+        self._fade_step_timer += self.delta_time
+        if self.is_faded:
+          if self.tk_obj.wm_attributes("-alpha") < 1.0:
+            self.tk_obj.wm_attributes("-alpha", self.tk_obj.wm_attributes("-alpha") + self.fade_step)
+            self._fade_step_timer = 0
+          else:
+            self.is_faded = False
+            self._is_fading = False
+        else:
+          if self.tk_obj.wm_attributes("-alpha") > 0.0:
+            self.tk_obj.wm_attributes("-alpha", self.tk_obj.wm_attributes("-alpha") - self.fade_step)
+            self._fade_step_timer = 0
+          else:
+            self.is_faded = True
+            self._is_fading = False
+
+      # Run update functionality for derived class and sibling classes
       self.update()
       if self.tk_obj == None: return
 
@@ -92,6 +116,15 @@ class Object(Base):
     if self.parent:
       self.parent.children = np.delete(self.parent.children, np.where(self.parent.children == self))
     environment.objects = np.delete(environment.objects, np.where(environment.objects == self))
+
+  # Fade in/out the object
+  def fade_in(self):
+    if not self.is_faded or self._is_fading: return
+    self._is_fading = True
+
+  def fade_out(self):
+    if self.is_faded or self._is_fading: return
+    self._is_fading = True
 
   # Debug function to print the hierarchy of the objects in the environment
   def print_hierarchy(self, depth=0):

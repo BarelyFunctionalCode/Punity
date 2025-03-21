@@ -78,9 +78,6 @@ class ScreenChunk(Object):
       return
     self.lifetime_timer += self.delta_time
     if self.lifetime_timer > self.lifetime:
-      if self.tk_obj.wm_attributes("-alpha") > 0.0:
-        self.tk_obj.wm_attributes("-alpha", self.tk_obj.wm_attributes("-alpha") - 0.05)
-        self.tk_obj.after(50, self.update)
-        return
-      self.destroy()
-      return
+      self.fade_out()
+      if self.is_faded:
+        self.destroy()

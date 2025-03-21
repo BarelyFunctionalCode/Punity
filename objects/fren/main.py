@@ -25,6 +25,8 @@ class Fren(Object, Movement, Rigidbody):
     self.is_waking_up = False
     self.inactivity_timer = 0
     self.inactivity_timeout = 2000
+    self.asleep_timer = 0
+    self.asleep_fade_timeout = 20000
     self.terminal_despawn_timer = 0
     self.terminal_despawn_timeout = 5000
     self.terminal = None
@@ -41,7 +43,7 @@ class Fren(Object, Movement, Rigidbody):
     if self.entrance:
       self.entrance = self.entrance(self.parent, self)
 
-    self.tk_obj.after(12000, lambda: self.enqueue_update_text("I make big shid, and I'm not sorry.\n\n\n💩"))
+    # self.tk_obj.after(12000, lambda: self.enqueue_update_text("I make big shid, and I'm not sorry.\n\n\n💩"))
 
 
   def update(self):
@@ -49,6 +51,11 @@ class Fren(Object, Movement, Rigidbody):
     if not hasattr(self, 'face'): return
 
     self.face.update()
+
+    if not self.is_active:
+      self.asleep_timer += self.delta_time
+      if self.asleep_timer > self.asleep_fade_timeout:
+        self.fade_out()
 
     if self.terminal and self.terminal.is_destroyed:
       self.terminal = None
@@ -70,6 +77,8 @@ class Fren(Object, Movement, Rigidbody):
         self.face.set_face_expression("sleep")
 
     if not self.is_active and not self.is_waking_up and self.inactivity_timer < self.inactivity_timeout:
+      self.fade_in()
+      self.asleep_timer = 0
       self.face.set_face_expression("wake")
       self.is_waking_up = True
     elif self.is_waking_up:

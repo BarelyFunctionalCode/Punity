@@ -13,6 +13,8 @@ class Terminal(Object):
     super().start()
     self.update_delay = 50
     self.update_delay_timer = 0
+    self.blink_delay = 500
+    self.blink_delay_timer = 0
     self.is_active = False
     self.do_destroy = False
     self.is_destroyed = False
@@ -30,13 +32,18 @@ class Terminal(Object):
     self.terminal_text.config(text="_")
 
     self.update()
-    self.blink_cursor()
 
   def start_destroy(self):
     self.do_destroy = True
 
   def update(self):
     super().update()
+
+    # Blinking cursor
+    self.blink_delay_timer += self.delta_time
+    if self.blink_delay_timer > self.blink_delay:
+      self.blink_cursor()
+      self.blink_delay_timer = 0
 
     self.update_delay_timer += self.delta_time
     if self.update_delay_timer < self.update_delay:
@@ -97,4 +104,3 @@ class Terminal(Object):
     current_output = self.terminal_text.cget('text')
     current_output = current_output[:-1] + (" " if current_output[-1] == "_" else "_")
     self.terminal_text.config(text=current_output)
-    self.tk_obj.after(500, self.blink_cursor)
