@@ -1,13 +1,14 @@
 import platform
 
-from .object import Object
+from environment import environment
+
+from base.object import Object
+
 from .border import Border
 from .editor import Editor
 
-from environment import environment
 
 class Scene(Object):
-
   def __init__(self, create_editor=False):
     super().__init__()
     self.editor = None

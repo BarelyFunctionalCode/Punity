@@ -1,5 +1,7 @@
-from objects.scene import Scene
-from objects.fren import Fren
+from base.scene import Scene
+
+from assets.objects.fren import Fren
+
 
 if __name__ == "__main__":
 

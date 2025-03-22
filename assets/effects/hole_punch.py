@@ -1,10 +1,11 @@
-from objects.object import Object
-from objects.hole import Hole
-from objects.screen_chunk import ScreenChunk
-
-from components.rigidbody import Rigidbody
-
 from environment import environment
+
+from base.object import Object
+from base.components.rigidbody import Rigidbody
+
+from assets.objects.hole import Hole
+from assets.objects.screen_chunk import ScreenChunk
+
 
 class ScreenChunkRigidbody(ScreenChunk, Rigidbody):
   def __init__(self, parent, polygon, x, y, lifetime=-1, collision_enabled=True):
@@ -17,14 +18,12 @@ class ScreenChunkRigidbody(ScreenChunk, Rigidbody):
     super().update()
 
 
-
 class HolePunch(Object):
   def __init__(self, parent, hole_polygon, x, y, lifetime=-1, collision_enabled=True):
     self.hole_polygon = hole_polygon
     self.lifetime = lifetime
     self.screen_chunk_collision_enabled = collision_enabled
     super().__init__(parent, 'hole_punch', 0, 0, x, y,True)
-
 
   def start(self):
     super().start()
@@ -33,7 +32,6 @@ class HolePunch(Object):
     # Create the hole object
     self.hole = Hole(self, self.hole_polygon, self.transform.position.x, self.transform.position.y, self.lifetime)
     self.hole.tk_obj.lower(self.screen_chunk.tk_obj)
-
 
   def update(self):
     super().update()

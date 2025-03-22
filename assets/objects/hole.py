@@ -1,6 +1,7 @@
 import tkinter as tk
 
-from objects.object import Object
+from base.object import Object
+
 
 class Hole(Object):
   def __init__(self, parent, hole_polygon, x, y, lifetime=-1):

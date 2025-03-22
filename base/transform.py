@@ -1,5 +1,6 @@
 from utils import Vector2
 
+
 class Transform:
   # Positional information used to update the TK Windows
   def __init__(self, object):

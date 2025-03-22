@@ -1,14 +1,16 @@
 from queue import Queue
 
-from .face import TkinterFace
-from ..terminal import Terminal
+from base.object import Object
+from base.components.movement import Movement
+from base.components.rigidbody import Rigidbody
 
-from ..object import Object
-from components.movement import Movement
-from components.rigidbody import Rigidbody
+from assets.objects.terminal import Terminal
+
 from utils import Vector2
 
+from .face import TkinterFace
 from . import actions
+
 
 class Fren(Object, Movement, Rigidbody):
   def __init__(self, parent, entrance=None):
@@ -44,7 +46,6 @@ class Fren(Object, Movement, Rigidbody):
       self.entrance = self.entrance(self.parent, self)
 
     # self.tk_obj.after(12000, lambda: self.enqueue_update_text("I make big shid, and I'm not sorry.\n\n\n💩"))
-
 
   def update(self):
     super().update()

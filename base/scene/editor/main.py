@@ -1,10 +1,7 @@
-import tkinter as tk
-
-from environment import environment
-
 from .control_menu import ControlMenu
 from .inspector import Inspector
 from .hierarchy import Hierarchy
+
 
 class Editor:
   def __init__(self, parent, force_expand=False):

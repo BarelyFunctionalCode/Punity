@@ -1,7 +1,10 @@
-from effects.hole_punch import HolePunch
-from objects.screen_chunk import ScreenChunk
-from objects.object import Object
+from base.object import Object
+
+from assets.effects.hole_punch import HolePunch
+from assets.objects.screen_chunk import ScreenChunk
+
 from utils import Vector2
+
 
 class HolePunchEntrance(Object):
   spawn_position = Vector2([500, 200])

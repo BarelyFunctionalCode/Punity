@@ -1,9 +1,10 @@
+from PIL import ImageTk, Image, ImageDraw
 import tkinter as tk
 import pyautogui
-from PIL import ImageTk, Image, ImageDraw
 import shapely
 
-from objects.object import Object
+from base.object import Object
+
 
 class ScreenChunk(Object):
   def __init__(self, parent, polygon, x, y, lifetime=-1, is_static=True, invert=False, invert_size=None, invert_point=None):
@@ -26,7 +27,6 @@ class ScreenChunk(Object):
     y -= invert_point.y if invert else 0
     super().__init__(parent, 'screen_chunk', width, height, x, y, is_static)
     
-  # @Object.shared_method
   def start(self):
     super().start() if hasattr(super(), 'start') else None
     x = int(self.transform.position.x)
@@ -70,7 +70,6 @@ class ScreenChunk(Object):
     self.graphic_canvas.create_image(0, 0, image=self.chunk_image, anchor=tk.NW)
 
     self.lifetime_timer = 0
-
 
   def update(self):
     super().update() if hasattr(super(), 'update') else None

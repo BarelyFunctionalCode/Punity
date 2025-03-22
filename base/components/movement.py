@@ -1,7 +1,8 @@
 import math
 
+from base.base import Base
+
 from utils import Vector2
-from components.base import Base
 from environment import environment
 
 class Movement(Base):

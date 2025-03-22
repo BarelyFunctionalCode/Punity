@@ -1,5 +1,6 @@
-from .object import Object
+from base.object import Object
 from utils import Side
+
 
 class BorderSide(Object):
   def __init__(self, parent, side: Side, width, height, x, y, thickness):
@@ -14,7 +15,6 @@ class BorderSide(Object):
 
     name = f"{side.name}_bound"
     super().__init__(parent, name, *params, True)
-
 
   def start(self):
     super().start()

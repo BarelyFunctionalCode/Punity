@@ -6,6 +6,7 @@ if platform.system() == 'Windows':
 else:
   from .macos import get_applications
 
+
 class ExternalApplication:
   def __init__(self, pid, name, title, size, position):
     self.pid = pid

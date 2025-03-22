@@ -1,6 +1,7 @@
 import tkinter as tk
 
-from objects.object import Object
+from base.object import Object
+
 
 class Terminal(Object):
   def __init__(self, parent, x, y, update_queue, talking_queue):

@@ -2,11 +2,13 @@ import tkinter as tk
 import time
 import numpy as np
 
-from components.base import Base
-from components.transform import Transform
+from environment import environment
+
+from base.base import Base
+from base.transform import Transform
+
 from utils import Vector2, invis_tk
 
-from environment import environment
 
 class Object(Base):
   def __init__(self, parent=None, name="root", width=0, height=0, x=0, y=0, is_static=True):

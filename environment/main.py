@@ -1,8 +1,10 @@
 import numpy as np
 import pyautogui
 
-from .external_application import update_applications
 from utils import Vector2
+
+from .external_application import update_applications
+
 
 class Environment:
   def __init__(self):

@@ -8,6 +8,7 @@ application_name_blacklist = [
   'Notification Center',
 ]
 
+
 def get_applications():
   windows = Quartz.CGWindowListCopyWindowInfo(Quartz.kCGWindowListExcludeDesktopElements | Quartz.kCGWindowListOptionOnScreenOnly, Quartz.kCGNullWindowID)
   applications = []

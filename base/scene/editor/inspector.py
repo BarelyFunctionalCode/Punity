@@ -5,6 +5,7 @@ from environment import environment
 
 class_blacklist = ['Object', 'Base']
 
+
 class Inspector:
   def __init__(self, parent):
     self.root_obj = parent.tk_obj
@@ -20,9 +21,7 @@ class Inspector:
     self.inspector.update_idletasks()
 
     self.active_obj = None
-
     self.obj_info = {}
-
     self.update_inspector()
   
   def create_label(self, pane, is_title=False, name='', value=''):
