@@ -9,20 +9,20 @@ Using Tkinter (tcl-tk) as the base for making graphics, and a similar structure 
 ## Project Structure
 
 - **main.py** - The obvious entrypoint, where the Scene is initialized along with any other objects to be spawned in at launch.
-
-- **environment** - Keeps track of the overall usable size to have objects in, tracks mouse and keyboard inputs, and tracks telemetry on other applications running.
-
-  - **external_application** - Collection of functions used to track other applications running on the system.
-
-    - **macos.py** - Uses Quartz bindings to enumerate running applications on MacOS.
-
-    - **windows.py** - TODO
   
-- **base** - Folder for all base classes and other pieces that should general remain untouched unless you have a good reason.
+- **engine** - Folder for all base classes and other pieces that should general remain untouched unless you have a good reason.
+
+  - **environment** - Keeps track of the overall usable size to have objects in, tracks mouse and keyboard inputs, and tracks telemetry on other applications running. A singleton of this class is created at the start and is accessed via `from engine import Environment` from anywhere in the project.
+
+    - **external_application** - Collection of functions used to track other applications running on the system.
+
+      - **macos.py** - Uses Quartz bindings to enumerate running applications on MacOS.
+
+      - **windows.py** - TODO
 
   - **Component.py** - Used for the base of object.py and anything in the `assets/components` folder, which allows for user-created objects to use multiple inheritence to select whichever components apply for their object. This class is responsible for storing any shared functions that span all objects and components.
 
-  - **object.py** - The base class used for all user-created object. This class facilitates the creation of the underlying Tk objects as well as runs the Update loop and collision detection for all objects.
+  - **object.py** - The base class used for all user-created objects. This class facilitates the creation of the underlying Tk objects as well as runs the Update loop and collision detection for all objects.
 
   - **transform.py** - Used by the `Object` class to manage positional and size data for all objects.
 
@@ -94,19 +94,27 @@ class NewObject(Object):
     super().__init__(parent, name, width, height, x, y, is_static)
 ```
 
+### Variables
+
+The following instance variables are defined in the base class `Object`, which can be referenced by any class that inherits from it.
+
+- `self.tk_obj` - The underlying Tk Window used for visualizing anything in the object. This is generally not used as most functionality dealing with Tk is abstracted away into class and helper functions.
+- `self.name` - The name of the object based on the string passed in to the `super().__init__` call.
+- `self.parent` - The `Object` that this class instance was spawned in to.
+- `self.children` - A list of `Object`'s that contains anything created within the logic of this class.
+- `self.is_static` - Indicates if the object is meant to ever move, and determines if it receives collision responses.
+- `self.collision_enabled` - Determines if this object should collide with others (Default `False`).
+- `self.collision_ignore_list` - A list of objects that this object should explicitly ignore collisions with.
+- `self.transform` - An instance of the `Transform` class and contains positional and size information about the object.
+- `self.delta_time` - The time elasped since the last update loop.
+
+### Methods
+
 The following functions are defined in the base class `Object` and need to contain the relevant `super` calls in them.
 
-### start
-
-This function is called once immediately after the `__init__` and before the `update` function.
-
-### update
-
-The update loop of the object, called directly after `start` and runs roughly every 10ms. Anything time-based within the update function should utilize the `self.delta_time` variable to get the time elasped since the last update loop.
-
-### on_collision
-
-The function is called for any object that has `self.collision_enabled` set to `True` and provides all the relevant data for said collision. Use this function to add additional logic to the existing collision handling.
+- `self.start` - This function is called once immediately after the `__init__` and before the `update` function.
+- `self.update` - The update loop of the object, called directly after `start` and runs roughly every 10ms. Anything time-based within the update function should utilize the `self.delta_time` variable to get the time elasped since the last update loop.
+- `self.on_collision` - The function is called for any object that has `self.collision_enabled` set to `True` and provides all the relevant data for said collision. Use this function to add additional logic to the existing collision handling.
 
 
 

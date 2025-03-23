@@ -1,7 +1,7 @@
 import numpy as np
 import pyautogui
 
-from utils import Vector2
+from engine.math import Vector2
 
 from .external_application import update_applications
 

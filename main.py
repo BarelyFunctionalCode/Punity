@@ -1,4 +1,4 @@
-from base.scene import Scene
+from engine.scene import Scene
 
 from assets.objects.fren import Fren
 

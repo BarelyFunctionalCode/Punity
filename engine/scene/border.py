@@ -1,5 +1,5 @@
-from base.object import Object
-from utils import Side
+from engine.object import Object
+from engine.math import Side
 
 
 class BorderSide(Object):

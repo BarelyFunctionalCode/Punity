@@ -2,12 +2,12 @@ import tkinter as tk
 import time
 import numpy as np
 
-from environment import environment
+from engine import Environment
+from engine.component import Base
+from engine.transform import Transform
+from engine.math import Vector2
+from engine.utils import invis_tk
 
-from base.component import Base
-from base.transform import Transform
-
-from utils import Vector2, invis_tk
 
 
 class Object(Base):
@@ -25,10 +25,10 @@ class Object(Base):
     self.is_static = is_static
     self.collision_enabled = False
     self.collision_ignore_list = []
-    self.paused = environment.paused
+    self.paused = Environment.paused
     self.last_update_time = time.time()
 
-    if parent == None and environment.root != None: return
+    if parent == None and Environment.root != None: return
 
     # Setting default TK Window Options
     self.tk_obj = invis_tk(tk.Toplevel(parent.tk_obj)) if parent != None else invis_tk(tk.Tk())
@@ -48,8 +48,8 @@ class Object(Base):
     # Init other sibling class instances
     super().__init__()
 
-    # Adding object to environment
-    environment.objects = np.append(environment.objects, self)
+    # Adding object to Environment
+    Environment.objects = np.append(Environment.objects, self)
 
     # Run start function, and start the update loop
     self.start()
@@ -88,7 +88,7 @@ class Object(Base):
 
       # Check for collisions if the object is not static
       if not self.is_static:
-        for obj in environment.objects:
+        for obj in Environment.objects:
           if obj == self: continue
           col_normal = self._collision_check(obj)
           if col_normal != None:
@@ -111,13 +111,13 @@ class Object(Base):
   def update(self):
     super().update()
 
-  # Destroys TK Window and removes object from environment
+  # Destroys TK Window and removes object from Environment
   def destroy(self):
     self.tk_obj.destroy()
     self.tk_obj = None
     if self.parent:
       self.parent.children = np.delete(self.parent.children, np.where(self.parent.children == self))
-    environment.objects = np.delete(environment.objects, np.where(environment.objects == self))
+    Environment.objects = np.delete(Environment.objects, np.where(Environment.objects == self))
 
   # Fade in/out the object
   def fade_in(self):
@@ -128,7 +128,7 @@ class Object(Base):
     if self.is_faded or self._is_fading: return
     self._is_fading = True
 
-  # Debug function to print the hierarchy of the objects in the environment
+  # Debug function to print the hierarchy of the objects in the Environment
   def print_hierarchy(self, depth=0):
     print(f"{' ' * depth}|{self.name}")
     for child in self.children:

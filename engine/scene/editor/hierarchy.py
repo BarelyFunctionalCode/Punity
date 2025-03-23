@@ -1,6 +1,6 @@
 import tkinter as tk
 
-from environment import environment
+from engine import Environment
 
 class Hierarchy:
   def __init__(self, parent, inspector, force_expand=False):
@@ -12,7 +12,7 @@ class Hierarchy:
     self.hierarchy = tk.Toplevel(self.root_obj)
     self.hierarchy.overrideredirect(True)
     self.hierarchy.title("punity_hierarchy")
-    self.hierarchy.geometry(f"200x{environment.height}+0+0")
+    self.hierarchy.geometry(f"200x{Environment.height}+0+0")
     self.hierarchy.update_idletasks()
     self.hierarchy.wm_attributes("-alpha", 0.8)
     self.hierarchy.wm_attributes("-topmost", True)
@@ -81,7 +81,7 @@ class Hierarchy:
         self.hierarchy_objs[toggled_obj_name]['obj'].destroy()
         self.hierarchy_objs.pop(toggled_obj_name)
 
-        current_obj = [environment.objects[i] for i in range(len(environment.objects)) if environment.objects[i].name.lower() == toggled_obj_name][0]
+        current_obj = [Environment.objects[i] for i in range(len(Environment.objects)) if Environment.objects[i].name.lower() == toggled_obj_name][0]
         def destroy_children(obj):
           if len(obj.children) > 0:
             for child in obj.children:

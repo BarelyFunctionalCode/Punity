@@ -1,9 +1,9 @@
-from base.object import Object
+from engine.object import Object
+from engine.math import Vector2
 
 from assets.effects.hole_punch import HolePunch
 from assets.objects.screen_chunk import ScreenChunk
 
-from utils import Vector2
 
 
 class HolePunchEntrance(Object):

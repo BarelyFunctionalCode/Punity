@@ -3,7 +3,7 @@ import tkinter as tk
 import pyautogui
 import shapely
 
-from base.object import Object
+from engine.object import Object
 
 
 class ScreenChunk(Object):

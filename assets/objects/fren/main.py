@@ -1,11 +1,11 @@
 from queue import Queue
 
-from base.object import Object
+from engine.object import Object
+from engine.math import Vector2
 
 from assets.components.rigidbody import Rigidbody
 from assets.objects.terminal import Terminal
 
-from utils import Vector2
 
 from .movement import Movement
 from .face import TkinterFace

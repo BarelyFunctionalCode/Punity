@@ -1,6 +1,6 @@
 import tkinter as tk
 
-from base.object import Object
+from engine.object import Object
 
 
 class Hole(Object):

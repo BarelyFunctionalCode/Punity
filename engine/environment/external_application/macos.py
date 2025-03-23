@@ -1,6 +1,6 @@
 import Quartz
 
-from utils import Vector2
+from engine.math import Vector2
 
 application_name_blacklist = [
   'Dock',

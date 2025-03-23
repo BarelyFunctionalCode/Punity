@@ -1,6 +1,6 @@
-from base.component import Base
+from engine.component import Base
+from engine.math import Vector2
 
-from utils import Vector2
 
 GRAVITY = 3
 

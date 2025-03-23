@@ -1,6 +1,5 @@
-from environment import environment
-
-from base.object import Object
+from engine import Environment
+from engine.object import Object
 
 from assets.components.rigidbody import Rigidbody
 from assets.objects.hole import Hole
@@ -35,7 +34,7 @@ class HolePunch(Object):
 
   def update(self):
     super().update()
-    if self.screen_chunk and self.screen_chunk.transform.position.y > environment.height:
+    if self.screen_chunk and self.screen_chunk.transform.position.y > Environment.height:
       self.screen_chunk.destroy()
       self.screen_chunk = None
 

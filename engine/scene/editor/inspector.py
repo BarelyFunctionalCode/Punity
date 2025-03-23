@@ -1,7 +1,7 @@
 import tkinter as tk
 import types
 
-from environment import environment
+from engine import Environment
 
 class_blacklist = ['Object', 'Base']
 
@@ -14,7 +14,7 @@ class Inspector:
     self.inspector = tk.Toplevel(self.root_obj)
     self.inspector.overrideredirect(True)
     self.inspector.title("punity_inspector")
-    self.inspector.geometry(f"300x{environment.height}+{environment.width - 300}+0")
+    self.inspector.geometry(f"300x{Environment.height}+{Environment.width - 300}+0")
     self.inspector.update_idletasks()
     self.inspector.wm_attributes("-alpha", 0.8)
     self.inspector.wm_attributes("-topmost", True)
@@ -75,7 +75,7 @@ class Inspector:
     self.inspector.after(100, self.update_inspector)
 
   def set_active_object(self, obj_name):
-    self.active_obj = environment.get_object(obj_name)
+    self.active_obj = Environment.get_object(obj_name)
 
     for label in self.obj_info.values():
       label.destroy()

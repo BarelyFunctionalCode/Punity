@@ -1,9 +1,9 @@
 import math
 
-from base.component import Base
+from engine import Environment
+from engine.component import Base
+from engine.math import Vector2
 
-from utils import Vector2
-from environment import environment
 
 class Movement(Base):
   def __init__(self):
@@ -36,8 +36,8 @@ class Movement(Base):
 
     # vector between mouse and display center
     distance = Vector2([
-      (current_position.x + self.transform.width // 2) - environment.mouse_position.x,
-      (current_position.y + self.transform.height // 2) - environment.mouse_position.y
+      (current_position.x + self.transform.width // 2) - Environment.mouse_position.x,
+      (current_position.y + self.transform.height // 2) - Environment.mouse_position.y
     ])
 
     # Move the display window based on the mouse position
