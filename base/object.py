@@ -4,7 +4,7 @@ import numpy as np
 
 from environment import environment
 
-from base.base import Base
+from base.component import Base
 from base.transform import Transform
 
 from utils import Vector2, invis_tk

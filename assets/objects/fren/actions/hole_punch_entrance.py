@@ -37,7 +37,7 @@ class HolePunchEntrance(Object):
     self.fren.tk_obj.lift(self.hole_punch.hole.tk_obj)
 
     # Screen Chunk for Fren to hide behind
-    self.screen_chunk = ScreenChunk(self, self.polygon, self.transform.position.x, self.transform.position.y, 5000, True, True, Vector2([250, 200]), Vector2([-85, 0]))
+    self.screen_chunk = ScreenChunk(self, self.polygon, self.transform.position.x, self.transform.position.y, 5000, True, Vector2([250, 200]), Vector2([-85, 0]))
     self.hole_punch.screen_chunk.tk_obj.lift(self.screen_chunk.tk_obj)
 
   def update(self):

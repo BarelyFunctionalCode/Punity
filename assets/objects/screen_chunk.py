@@ -7,12 +7,12 @@ from base.object import Object
 
 
 class ScreenChunk(Object):
-  def __init__(self, parent, polygon, x, y, lifetime=-1, is_static=True, invert=False, invert_size=None, invert_point=None):
+  def __init__(self, parent, polygon, x, y, lifetime=-1, is_static=True, invert_size=None, invert_point=None):
     self.polygon = polygon
     self.lifetime = lifetime
-    self.invert = invert
     self.invert_size = invert_size
     self.invert_point = invert_point
+    self.invert = False if invert_size is None else True
 
     # Get min/max x/y values
     min_x = min(polygon[::2])
@@ -20,11 +20,11 @@ class ScreenChunk(Object):
     min_y = min(polygon[1::2])
     max_y = max(polygon[1::2])
     # Get width and height
-    width = invert_size.x if invert else max_x - min_x
-    height = invert_size.y if invert else max_y - min_y
+    width = invert_size.x if self.invert else max_x - min_x
+    height = invert_size.y if self.invert else max_y - min_y
     # Update x and y values if inverted
-    x -= invert_point.x if invert else 0
-    y -= invert_point.y if invert else 0
+    x -= invert_point.x if self.invert else 0
+    y -= invert_point.y if self.invert else 0
     super().__init__(parent, 'screen_chunk', width, height, x, y, is_static)
     
   def start(self):

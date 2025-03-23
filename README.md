@@ -1,6 +1,109 @@
 # PUnity
 
-Unity, but in Python? Using Tkinter as a graphics base
+Unity, but in Python?
+
+This project is geared towards creating UI experiences not bound to an application window, or at least make it look that way.
+
+Using Tkinter (tcl-tk) as the base for making graphics, and a similar structure and workflow as Unity, you can create anything from a persistant customized menu, an overlay for another program, or even a full-blown video game.
+
+## Project Structure
+
+- **main.py** - The obvious entrypoint, where the Scene is initialized along with any other objects to be spawned in at launch.
+
+- **environment** - Keeps track of the overall usable size to have objects in, tracks mouse and keyboard inputs, and tracks telemetry on other applications running.
+
+  - **external_application** - Collection of functions used to track other applications running on the system.
+
+    - **macos.py** - Uses Quartz bindings to enumerate running applications on MacOS.
+
+    - **windows.py** - TODO
+  
+- **base** - Folder for all base classes and other pieces that should general remain untouched unless you have a good reason.
+
+  - **base.py** - Believe it or not, the base class. Used for the base of object.py and anything in the `assets/components` folder, which allows for user-created objects to use multiple inheritence to select whichever components apply for their object. This class is responsible for storing any shared functions that span all objects and components.
+
+  - **object.py** - The base class used for all user-created object. This class facilitates the creation of the underlying Tk objects as well as runs the Update loop and collision detection for all objects.
+
+  - **transform.py** - Used by the `Object` class to manage positional and size data for all objects.
+
+  - **scene** - Class used to create the root Tk Window and the collision objects for the screen border. Also houses the `Editor` class.
+
+    - **border.py** - A meta object of sorts thats used to add collision detection to the edges of the screen.
+
+    - **editor** - Collection of inspection and testing tools used in the development process.
+
+      - **control_menu.py** - Houses the controls for pausing/playing, adjusting the timescale, and toggling the `Hierarchy` and `Inspector` windows.
+
+      - **hierarchy.py** - A sidebar that lists and shows the relationships of all the objects in the scene. Also, by selecting an item in the list you can populate the `Inspector` window with the details of the selected object.
+
+      - **inspector.py** - A sidebar that shows the details about a selected object. By the powerers of python black magic, the `Insoector` will take a selected object, look up all the variables defined in the child and base classes, and display the current values of those variables broken up in sections by class. NOTE: This only shows variables that are defined in a given class's `__init__` function.
+
+- **assets** - Where all the user-defined classes live.
+
+  - **components** - Base classes used to add predefined logic to user-defined objects.
+
+    - **rigidbody.py** - Managed a physics simulation on a given object and allows you to apply directional force to said object.
+
+  - **objects** - Anything that gets spawned and rendered on-screen.
+
+    - **hole.py** - Creates a black hole on-screen defined by the inputs.
+      - Inputs:
+        - hole_polygon - Collection of verticies that defines the shape of the hole to create.
+        - x - x position.
+        - y - y position.
+        - lifetime - An optional value that defines when the hole despawns.
+
+    - **screen_chunk.py** - Creates a copy of a portion of the screen defined by the inputs.
+      - Inputs:
+        - polygon - Collection of verticies that defines the shape of the chunk..
+        - x - x position.
+        - y - y position.
+        - lifetime - An optional value that defines when the hole despawns.
+        - is_static - Dictates if the object is meant to move or not.
+        - invert_size - If defined, determines the size of the screen chunk with the polygon shape being cut out of the chunk.
+        - invert_point - The x,y position where the polygon cutout is relative in the invert_size box.
+    
+    - **terminal.py** - A retro style terminal window used to output text.
+      - Inputs:
+        - x - x position.
+        - y - y position.
+        - update_queue - A python `Queue` object provided to allow an input stream used to output the text on the terminal.
+  
+  **effects** - Classes that are collections of objects that are executed in a predefined sequence.
+
+    - **hole_punch.py** - Uses the `Hole` and `ScreenChunk` objects to visually create a chunk of the screen break out and fall to the ground, leaving a hole behind.
+      - Inputs:
+        - hole_polygon - Collection of verticies that defines the shape of the hole/chunk to create.
+        - x - x position.
+        - y - y position.
+        - lifetime - An optional value that defines when the hole despawns.
+        - collision_enabled - Determines if the resulting `ScreenChunk` produces collision events.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # Road to 1.0 demo
 

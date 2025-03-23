@@ -1,8 +1,8 @@
 from environment import environment
 
 from base.object import Object
-from base.components.rigidbody import Rigidbody
 
+from assets.components.rigidbody import Rigidbody
 from assets.objects.hole import Hole
 from assets.objects.screen_chunk import ScreenChunk
 

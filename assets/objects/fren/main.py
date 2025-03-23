@@ -1,13 +1,13 @@
 from queue import Queue
 
 from base.object import Object
-from base.components.movement import Movement
-from base.components.rigidbody import Rigidbody
 
+from assets.components.rigidbody import Rigidbody
 from assets.objects.terminal import Terminal
 
 from utils import Vector2
 
+from .movement import Movement
 from .face import TkinterFace
 from . import actions
 

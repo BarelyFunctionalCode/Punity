@@ -1,4 +1,4 @@
-from base.base import Base
+from base.component import Base
 
 from utils import Vector2
 
