@@ -20,7 +20,7 @@ Using Tkinter (tcl-tk) as the base for making graphics, and a similar structure 
   
 - **base** - Folder for all base classes and other pieces that should general remain untouched unless you have a good reason.
 
-  - **base.py** - Believe it or not, the base class. Used for the base of object.py and anything in the `assets/components` folder, which allows for user-created objects to use multiple inheritence to select whichever components apply for their object. This class is responsible for storing any shared functions that span all objects and components.
+  - **Component.py** - Used for the base of object.py and anything in the `assets/components` folder, which allows for user-created objects to use multiple inheritence to select whichever components apply for their object. This class is responsible for storing any shared functions that span all objects and components.
 
   - **object.py** - The base class used for all user-created object. This class facilitates the creation of the underlying Tk objects as well as runs the Update loop and collision detection for all objects.
 
@@ -79,6 +79,34 @@ Using Tkinter (tcl-tk) as the base for making graphics, and a similar structure 
         - lifetime - An optional value that defines when the hole despawns.
         - collision_enabled - Determines if the resulting `ScreenChunk` produces collision events.
 
+## Creating a new Object
+
+In order to create a new object you need to use the `Object` base class and at the bare minumum have an `__init__` function that ends with calling `super().__init__(parent, "OBJECT NAME")`. The other parameters (`width`, `height`, `x`, `y`, `is_static`) are optional and can be set as needed.
+```
+class NewObject(Object):
+  def __init__(self):
+    name = "NewObject"
+    width = 100
+    height = 100
+    x = 0
+    y = 0
+    is_static = True
+    super().__init__(parent, name, width, height, x, y, is_static)
+```
+
+The following functions are defined in the base class `Object` and need to contain the relevant `super` calls in them.
+
+### start
+
+This function is called once immediately after the `__init__` and before the `update` function.
+
+### update
+
+The update loop of the object, called directly after `start` and runs roughly every 10ms. Anything time-based within the update function should utilize the `self.delta_time` variable to get the time elasped since the last update loop.
+
+### on_collision
+
+The function is called for any object that has `self.collision_enabled` set to `True` and provides all the relevant data for said collision. Use this function to add additional logic to the existing collision handling.
 
 
 
@@ -94,8 +122,7 @@ Using Tkinter (tcl-tk) as the base for making graphics, and a similar structure 
 
 
 
-
-
+-----------------------------------
 
 
 
