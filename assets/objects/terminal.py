@@ -4,25 +4,29 @@ from engine.object import Object
 
 
 class Terminal(Object):
-  def __init__(self, parent, x, y, update_queue, talking_queue):
+  def __init__(self, parent, x, y, inactivity_timeout, update_queue, talking_queue):
     self.update_queue = update_queue
     self.talking_queue = talking_queue
 
-    super().__init__(parent, 'terminal', 300, 100, x, y, True)
-
-  def start(self):
-    super().start()
     self.update_delay = 50
     self.update_delay_timer = 0
     self.blink_delay = 500
     self.blink_delay_timer = 0
     self.is_active = False
+
+    self.inactivity_timeout = inactivity_timeout
+    self.inactivity_timer = 0
     self.do_destroy = False
     self.is_destroyed = False
 
     # Terminal Parameters
     self.terminal_text_output = ""
     self.terminal_text_output_index = 0
+
+    super().__init__(parent, 'terminal', 300, 100, x, y, True)
+
+  def start(self):
+    super().start()
 
     # Terminal for text output
     self.frame = tk.Frame(self.tk_obj, bg="black", cursor='none')
@@ -39,6 +43,12 @@ class Terminal(Object):
 
   def update(self):
     super().update()
+    if self.is_active:
+      self.inactivity_timer = 0
+    else:
+      self.inactivity_timer += self.delta_time
+      if self.inactivity_timer > self.inactivity_timeout:
+        self.do_destroy = True
 
     # Blinking cursor
     self.blink_delay_timer += self.delta_time

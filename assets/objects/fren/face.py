@@ -12,12 +12,9 @@ from .expressions import expressions
 class Face(Base):
   def __init__(self):
     self.is_face_active = False
-    self.is_face_enabled = True
     self.is_face_asleep = False
-
     self.current_expression = None
     self.face_update_timer = 0
-    self.sleep_drift_direction = np.array([0.0, 0.0, 0.0])
 
     # Eyes
     self.pupil_movement_factor = 1.0
@@ -90,26 +87,22 @@ class Face(Base):
   # Loop for updating the face
   def update(self):
     super().update()
+    if self.is_face_active:
+      self.inactivity_timer = 0
+
     # Update mouth open factor from queue
-    if self.talking_mouth_delay_timer > self.talking_mouth_delay and self.is_face_enabled and not self.talking_queue.empty():
+    if not self.is_face_asleep and self.talking_mouth_delay_timer > self.talking_mouth_delay and not self.talking_queue.empty():
       self.talking_mouth_delay_timer = 0
       self.face_parameters["mouth_open_factor"]["target_value"] = self.talking_queue.get()
     
-    self.talking_mouth_delay_timer += self.delta_time
+    if self.talking_mouth_delay_timer <= self.talking_mouth_delay:
+      self.talking_mouth_delay_timer += self.delta_time
 
     # Update face parameters from queue
     if not self.update_queue.empty():
-      if self.is_face_enabled or self.is_face_asleep: self.is_face_active = True
-      if (self.is_face_enabled or self.current_expression in ["sleep", "wake"]) and \
-          self.face_update_timer <= date.datetime.now().timestamp():
+      self.is_face_active = True
+      if self.face_update_timer <= date.datetime.now().timestamp():
         face_update, duration = self.update_queue.get()
-
-        if self.current_expression == "sleep":
-          self.is_face_enabled = False
-          self.is_face_active = False
-        if self.current_expression == "wake":
-          self.is_face_asleep = False
-
         self.face_update_timer = date.datetime.now().timestamp() + duration
 
         for parameter_name in face_update:
@@ -126,9 +119,16 @@ class Face(Base):
       if self.current_expression == "sleep":
         self.is_face_asleep = True
       if self.current_expression == "wake": 
-        self.is_face_enabled = True
+        self.is_face_asleep = False
       self.current_expression = None
       self.is_face_active = False
+
+
+
+
+
+
+
 
     # Update face parameters that can be customized
     for parameter_name in self.face_parameters:
@@ -246,12 +246,18 @@ class Face(Base):
       self.mouth.update(mouth_line)
 
   # Used to set the face expression
-  def set_face_canvas_expression(self, expression):
+  def set_face_expression(self, expression):
+    if self.is_face_asleep and expression != "wake":
+      return
     if expression in expressions:
       self.current_expression = expression
 
       for step, duration in expressions[expression]:
         self.update_queue.put((step, duration))
+
+  # Used by the assistant to update the face parameters
+  def enqueue_update_face(self, new_face_parameters, duration):
+    self.update_queue.put((new_face_parameters, duration))
   
   # Adjust face parameter based on target value and speed
   def adjust_face_parameter(self, parameter):

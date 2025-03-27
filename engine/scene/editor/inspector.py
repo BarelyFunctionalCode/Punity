@@ -22,6 +22,7 @@ class Inspector:
 
     self.active_obj = None
     self.obj_info = {}
+    self.pane_heights = {}
     self.update_inspector()
   
   def create_label(self, pane, is_title=False, name='', value=''):
@@ -40,7 +41,12 @@ class Inspector:
       # wraplength=300,
       # justify=tk.LEFT
     )
-    self.obj_info[pane + '_pane'].add(self.obj_info[pane + '_' +name])
+    if pane not in self.pane_heights:
+      self.pane_heights[pane] = 0
+    self.obj_info[pane + '_' +name].place(x=0, y=self.pane_heights[pane], anchor='nw')
+    self.inspector.update_idletasks()
+    self.pane_heights[pane] += self.obj_info[pane + '_' +name].winfo_height()
+    self.obj_info[pane + '_pane'].config(height=self.pane_heights[pane])
 
   def update_label(self, pane, name, value):
     max_name_length = 20
@@ -50,11 +56,14 @@ class Inspector:
 
   def create_pane(self, name, make_title=False):
     pane_name = name + '_pane'
-    self.obj_info[pane_name] = tk.PanedWindow(self.inspector, orient=tk.VERTICAL, background='#333')
-    self.obj_info['master_pane'].add(self.obj_info[pane_name])
+    self.obj_info[pane_name] = tk.Frame(self.obj_info['master_pane'], width=self.inspector.winfo_width(), background='#333')
+    # Get the current height of the master pane
+    total_height = sum([self.pane_heights[pane] for pane in self.pane_heights.keys()])
+    self.obj_info['master_pane'].create_window(0, total_height, window=self.obj_info[pane_name], anchor=tk.NW)
 
     if make_title:
       self.create_label(name, True)
+    self.inspector.update_idletasks()
 
   def update_inspector(self):
     if self.active_obj == None:
@@ -80,14 +89,22 @@ class Inspector:
     for label in self.obj_info.values():
       label.destroy()
     self.obj_info = {}
+    self.pane_heights = {}
 
     # Put Object name at the top
     self.obj_info['name'] = tk.Label(self.inspector, text=f"{self.active_obj.name}", width=30, pady=1, anchor='w', font=('Courier New', 20, 'bold'))
     self.obj_info['name'].pack(side=tk.TOP, fill=tk.X)
 
     # Create a master pane to hold all the other panes
-    self.obj_info['master_pane'] = tk.PanedWindow(self.inspector, orient=tk.VERTICAL)
-    self.obj_info['master_pane'].pack(side=tk.TOP, fill=tk.X)
+    self.obj_info['master_pane'] = tk.Canvas(
+      self.inspector,
+      width=self.inspector.winfo_width(),
+      height=self.inspector.winfo_height() - self.obj_info['name'].winfo_height(),
+      yscrollincrement=5,
+    )
+    self.obj_info['master_pane'].pack(side=tk.TOP)
+
+    self.inspector.update_idletasks()
 
     self.create_pane('base_object')
     # Put whether or not the object is static
@@ -104,21 +121,27 @@ class Inspector:
     self.create_pane('space')
     self.create_label('space')
 
-    # Child object information
-    self.create_pane('object')
-
-    property_names=[p for p in dir(self.active_obj) if not isinstance(getattr(self.active_obj,p), types.MethodType) and not p.startswith('__')]
+    derived_properties=[p for p in dir(self.active_obj) if not isinstance(getattr(self.active_obj,p), types.MethodType) and not p.startswith('__')]
     # Get object base classes
     bases = self.active_obj.__class__.__bases__
 
     # For each base class not in the blacklist, add a pane and enumerate the properties
+    bases_properties = {}
     for base in bases:
       base_name = base.__name__
       class_obj = base()
-      base_property_names=[p for p in property_names if hasattr(class_obj, p)]
-      property_names = [p for p in property_names if p not in base_property_names]
+      base_property_names=[p for p in derived_properties if hasattr(class_obj, p)]
+      derived_properties = [p for p in derived_properties if p not in base_property_names]
       class_obj = None
       if base_name not in class_blacklist:
+        bases_properties[base_name] = base_property_names
+
+    # Enumerate the properties that the child object defines
+    self.create_pane('object')
+    for prop in derived_properties:
+      self.create_label('object', False, prop, getattr(self.active_obj, prop))
+
+    for base_name, base_property_names in bases_properties.items():
         # Create and title a new pane
         self.create_pane(base_name, True)
 
@@ -126,6 +149,24 @@ class Inspector:
         for prop in base_property_names:
           self.create_label(base_name, False, prop, getattr(self.active_obj, prop))
     
-    # Enumerate the properties that the child object defines
-    for prop in property_names:
-      self.create_label('object', False, prop, getattr(self.active_obj, prop))
+    self.inspector.update_idletasks()
+
+    # Create srollbar
+    total_height = sum([self.pane_heights[pane] for pane in self.pane_heights.keys()])
+    self.obj_info['scrollbar'] = tk.Scrollbar(self.inspector)
+    self.obj_info['scrollbar'].place(relx=1, rely=0, relheight=1, anchor='ne')
+    self.obj_info['master_pane'].config(
+      yscrollcommand=self.obj_info['scrollbar'].set,
+      scrollregion=(0,0,self.inspector.winfo_width(), total_height)
+    )
+    self.obj_info['scrollbar'].config(command=self.obj_info['master_pane'].yview)
+
+    def _on_mousewheel(event):
+      self.obj_info['master_pane'].yview_scroll(-event.delta, "units")
+    def _bind_to_mousewheel(_):
+      self.obj_info['master_pane'].bind_all("<MouseWheel>", _on_mousewheel)
+    def _unbind_from_mousewheel(_):
+      self.obj_info['master_pane'].unbind_all("<MouseWheel>")
+
+    self.obj_info['master_pane'].bind('<Enter>', _bind_to_mousewheel)
+    self.obj_info['master_pane'].bind('<Leave>', _unbind_from_mousewheel)

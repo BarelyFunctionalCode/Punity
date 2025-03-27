@@ -14,6 +14,7 @@ from . import actions
 
 class Fren(Object, Face, Movement, Rigidbody):
   def __init__(self, parent, entrance=None):
+    # Setting up the entrance that's defined
     self.face_polygon = [20,0, 120,0, 140,20, 145,90, 120,140, 90,160, 50,160, 20,140, -5,90, 0,20, 20,0,]
     x = 200
     y = 200
@@ -23,8 +24,7 @@ class Fren(Object, Face, Movement, Rigidbody):
       x = self.entrance.spawn_position.x
       y = self.entrance.spawn_position.y
 
-    self.is_active = True
-    self.is_waking_up = False
+    self.is_busy = False
     self.inactivity_timer = 0
     self.inactivity_timeout = 2000
     self.asleep_timer = 0
@@ -37,8 +37,10 @@ class Fren(Object, Face, Movement, Rigidbody):
     
   def start(self):
     super().start()
+    # Initializing gravity as disabled
     self.use_gravity = False
 
+    # Run the entrance
     if self.entrance:
       self.entrance = self.entrance(self.parent, self)
 
@@ -46,58 +48,40 @@ class Fren(Object, Face, Movement, Rigidbody):
 
   def update(self):
     super().update()
+    self.is_busy = (self.terminal and self.terminal.is_active) or self.is_face_active
+    if self.is_busy:
+      self.inactivity_timer = 0
+      return
+    
 
-    if not self.is_active:
-      self.asleep_timer += self.delta_time
-      if self.asleep_timer > self.asleep_fade_timeout:
+    if self.inactivity_timer < self.inactivity_timeout:
+      self.inactivity_timer += self.delta_time
+    else:
+      self.set_face_expression("sleep")
+
+      # Once asleep for long enough, fade out
+      if self.asleep_timer < self.asleep_fade_timeout:
+        self.asleep_timer += self.delta_time
+      else:
         self.fade_out()
 
+
+    # TODO: Terminal should destroy itself when it's done
     if self.terminal and self.terminal.is_destroyed:
       self.terminal = None
-    if self.terminal and self.terminal.is_active:
-      self.terminal_despawn_timer = 0
-    if self.is_face_active:
-      self.inactivity_timer = 0
 
-    if self.is_active:
-      if self.terminal and not self.terminal.is_active:
-        self.terminal_despawn_timer += self.delta_time
-      if not self.terminal and not self.is_face_active:
-        self.inactivity_timer += self.delta_time
-
-      if self.terminal and self.terminal_despawn_timer > self.terminal_despawn_timeout:
-        self.terminal.start_destroy()
-      if not self.terminal and self.inactivity_timer > self.inactivity_timeout:
-        self.is_active = False
-        self.set_face_expression("sleep")
-
-    if not self.is_active and not self.is_waking_up and self.inactivity_timer < self.inactivity_timeout:
-      self.fade_in()
-      self.asleep_timer = 0
-      self.set_face_expression("wake")
-      self.is_waking_up = True
-    elif self.is_waking_up:
-      if self.is_face_enabled:
-        self.is_active = True
-        self.is_waking_up = False
-        if not self.terminal and not self.terminal_update_queue.empty():
-          terminal_position = self.transform.position.astype(int) - Vector2([0, 100])
-          self.terminal = Terminal(self, terminal_position.x, terminal_position.y, self.terminal_update_queue, self.talking_queue)
+    if not self.terminal and not self.terminal_update_queue.empty():
+      terminal_position = self.transform.position.astype(int) - Vector2([0, 100])
+      self.terminal = Terminal(self, terminal_position.x, terminal_position.y, self.terminal_update_queue, self.talking_queue)
 
     if self.is_face_asleep and self.move_mode != 'sleep':
       self.set_move_mode('sleep')
 
-  # Used by the assistant to update the face parameters
-  def enqueue_update_face(self, new_face_parameters, duration):
-    self.update_queue.put((new_face_parameters, duration))
+  def wake_up(self):
+    self.asleep_timer = 0
+    self.fade_in()
+    self.set_face_expression("wake")
 
   # Used by the assistant to update the terminal text
   def enqueue_update_text(self, text):
     self.terminal_update_queue.put(text)
-    if not self.terminal:
-      terminal_position = self.transform.position.astype(int) - Vector2([0, 100])
-      self.terminal = Terminal(self, terminal_position.x, terminal_position.y, self.terminal_update_queue, self.talking_queue)
-
-  # Used by the assistant to set the face expression
-  def set_face_expression(self, expression):
-    self.set_face_canvas_expression(expression)
