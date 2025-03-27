@@ -5,3 +5,4 @@ python-xlib
 shapely
 pywinctl
 py2app
+opencv-python

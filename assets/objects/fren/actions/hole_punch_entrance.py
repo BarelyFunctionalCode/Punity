@@ -11,7 +11,7 @@ class HolePunchEntrance(Object):
 
   def __init__(self, parent, fren):
     self.fren = fren
-    self.polygon = fren.face_polygon
+    self.polygon = list(fren.face_polygon)
     if self.polygon == None:
       self.polygon = [0,0, 200,0, 200,200, 0,200]
     # Offset from the hole punch and the extra screen chunk

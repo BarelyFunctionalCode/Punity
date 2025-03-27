@@ -3,31 +3,47 @@ import tkinter as tk
 import numpy as np
 import datetime as date
 
+from engine.component import Base
+from engine.graphics.shape import Polygon, Rectangle, Line
+
 from .expressions import expressions
 
 
-class TkinterFace:
-  def __init__(self, obj, face_polygon):
-    self.obj = obj
-    self.tk_obj = obj.tk_obj
-    self.face_polygon = face_polygon
-    self.is_active = False
-    self.is_enabled = True
+class Face(Base):
+  def __init__(self):
+    self.is_face_active = False
+    self.is_face_enabled = True
+    self.is_face_asleep = False
 
-    self.is_asleep = False
+    self.current_expression = None
+    self.face_update_timer = 0
+    self.sleep_drift_direction = np.array([0.0, 0.0, 0.0])
 
-    self.width = self.tk_obj.winfo_width()
-    self.height = self.tk_obj.winfo_height()
+    # Eyes
+    self.pupil_movement_factor = 1.0
+    self.blink_timer = 100
 
-    # Canvas for drawing face
-    self.graphic_canvas = tk.Canvas(self.tk_obj, width=self.width, height=self.height, bg=self.tk_obj['bg'], bd=0, highlightthickness=0, cursor='none')
-    self.graphic_canvas.pack(padx=0, pady=0, side=tk.TOP)
+    # Objects
+    self.initialized = False
+    self.face = None
+    self.eyes = [None, None]
+    self.pupils = [None, None]
+    self.mouth = None
 
+    self.update_queue = Queue()
+    self.talking_queue = Queue()
+    self.talking_mouth_delay = 50
+    self.talking_mouth_delay_timer = 0
+
+    super().__init__()
+
+  def start(self):
+    super().start()
     # Face Parameters
     self.face_parameters = {
       "look_target": {
-        "current_value": np.array([self.width / 2, self.height / 3, 1000.0]),
-        "target_value": np.array([self.width / 2, self.height / 3, 1000.0]),
+        "current_value": np.array([self.transform.width / 2, self.transform.height / 3, 1000.0]),
+        "target_value": np.array([self.transform.width / 2, self.transform.height / 3, 1000.0]),
         "max_speed": 20,
         "min_speed": 1,
         "speed_factor": 1.0
@@ -63,83 +79,36 @@ class TkinterFace:
         "speed_factor": 1.0,
       },
       "face_position": {
-        "current_value": np.array([self.width / 2, 75.0, 0]),
-        "target_value": np.array([self.width / 2, 75.0, 0]),
+        "current_value": np.array([self.transform.width / 2, 75.0, 0]),
+        "target_value": np.array([self.transform.width / 2, 75.0, 0]),
         "max_speed": 20,
         "min_speed": 1,
         "speed_factor": 1.0,
       },
     }
 
-    self.current_expression = None
-
-    self.face_update_timer = 0
-
-    self.sleep_drift_direction = np.array([0.0, 0.0, 0.0])
-
-    # Eyes
-    self.pupil_movement_factor = 1.0
-    self.blink_timer = 100
-
-    # Objects
-    self.eyes = [None, None]
-    self.pupils = [None, None]
-    self.mouth = None
-
-    self.update_queue = Queue()
-    self.talking_queue = Queue()
-    self.talking_mouth_delay = 50
-    self.talking_mouth_delay_timer = 0
-
-  # Used to set the face expression
-  def set_face_expression(self, expression):
-    if expression in expressions:
-      self.current_expression = expression
-
-      for step, duration in expressions[expression]:
-        self.update_queue.put((step, duration))
-  
-  # Adjust face parameter based on target value and speed
-  def adjust_face_parameter(self, parameter):
-    parameter_data = self.face_parameters[parameter]
-    
-    parameter_data["current_value"] = np.clip(
-      (
-        parameter_data["current_value"] +
-        (
-          np.sign(parameter_data["target_value"] - parameter_data["current_value"]) * (
-            (
-              (1 - parameter_data["speed_factor"]) * parameter_data["min_speed"] +
-              parameter_data["speed_factor"] * parameter_data["max_speed"]
-            )
-          )
-        )
-      ),
-      np.minimum(parameter_data["current_value"], parameter_data["target_value"]),
-      np.maximum(parameter_data["current_value"], parameter_data["target_value"])
-    )
-
   # Loop for updating the face
   def update(self):
+    super().update()
     # Update mouth open factor from queue
-    if self.talking_mouth_delay_timer > self.talking_mouth_delay and self.is_enabled and not self.talking_queue.empty():
+    if self.talking_mouth_delay_timer > self.talking_mouth_delay and self.is_face_enabled and not self.talking_queue.empty():
       self.talking_mouth_delay_timer = 0
       self.face_parameters["mouth_open_factor"]["target_value"] = self.talking_queue.get()
     
-    self.talking_mouth_delay_timer += self.obj.delta_time
+    self.talking_mouth_delay_timer += self.delta_time
 
     # Update face parameters from queue
     if not self.update_queue.empty():
-      if self.is_enabled or self.is_asleep: self.is_active = True
-      if (self.is_enabled or self.current_expression in ["sleep", "wake"]) and \
+      if self.is_face_enabled or self.is_face_asleep: self.is_face_active = True
+      if (self.is_face_enabled or self.current_expression in ["sleep", "wake"]) and \
           self.face_update_timer <= date.datetime.now().timestamp():
         face_update, duration = self.update_queue.get()
 
         if self.current_expression == "sleep":
-          self.is_enabled = False
-          self.is_active = False
+          self.is_face_enabled = False
+          self.is_face_active = False
         if self.current_expression == "wake":
-          self.is_asleep = False
+          self.is_face_asleep = False
 
         self.face_update_timer = date.datetime.now().timestamp() + duration
 
@@ -155,11 +124,11 @@ class TkinterFace:
     # Clear out if current expression is finished and the update queue is empty
     if self.face_update_timer <= date.datetime.now().timestamp() and self.update_queue.empty():
       if self.current_expression == "sleep":
-        self.is_asleep = True
+        self.is_face_asleep = True
       if self.current_expression == "wake": 
-        self.is_enabled = True
+        self.is_face_enabled = True
       self.current_expression = None
-      self.is_active = False
+      self.is_face_active = False
 
     # Update face parameters that can be customized
     for parameter_name in self.face_parameters:
@@ -260,16 +229,46 @@ class TkinterFace:
       )
 
     # Draw Face
-    if self.graphic_canvas.find_all() == ():
-      self.graphic_canvas.create_polygon(*self.face_polygon, fill='#004400', stipple='gray75', smooth=True)
-      self.eyes[0] = self.graphic_canvas.create_rectangle(eye_ovals[0], outline='green', width=4)
-      self.eyes[1] = self.graphic_canvas.create_rectangle(eye_ovals[1], outline='green', width=4)
-      self.pupils[0] = self.graphic_canvas.create_rectangle(pupil_ovals[0], outline='#008800', width=1, fill='#008800')
-      self.pupils[1] = self.graphic_canvas.create_rectangle(pupil_ovals[1], outline='#008800', width=1, fill='#008800')
-      self.mouth = self.graphic_canvas.create_line(mouth_line, fill='green', width=4)
+    if not self.initialized:
+      self.initialized = True
+      self.face = Polygon(self, self.face_polygon, fill='#004400', stipple='gray75', smooth=True)
+      self.eyes[0] = Rectangle(self, eye_ovals[0], outline='green', width=4)
+      self.eyes[1] = Rectangle(self, eye_ovals[1], outline='green', width=4)
+      self.pupils[0] = Rectangle(self, pupil_ovals[0], outline='#008800', width=1, fill='#008800')
+      self.pupils[1] = Rectangle(self, pupil_ovals[1], outline='#008800', width=1, fill='#008800')
+      self.mouth = Line(self, mouth_line, fill='green', width=4)
     else:
-      self.graphic_canvas.coords(self.eyes[0], eye_ovals[0])
-      self.graphic_canvas.coords(self.eyes[1], eye_ovals[1])
-      self.graphic_canvas.coords(self.pupils[0], pupil_ovals[0])
-      self.graphic_canvas.coords(self.pupils[1], pupil_ovals[1])
-      self.graphic_canvas.coords(self.mouth, mouth_line)
+      self.face.update(self.face_polygon)
+      self.eyes[0].update(eye_ovals[0])
+      self.eyes[1].update(eye_ovals[1])
+      self.pupils[0].update(pupil_ovals[0])
+      self.pupils[1].update(pupil_ovals[1])
+      self.mouth.update(mouth_line)
+
+  # Used to set the face expression
+  def set_face_canvas_expression(self, expression):
+    if expression in expressions:
+      self.current_expression = expression
+
+      for step, duration in expressions[expression]:
+        self.update_queue.put((step, duration))
+  
+  # Adjust face parameter based on target value and speed
+  def adjust_face_parameter(self, parameter):
+    parameter_data = self.face_parameters[parameter]
+    
+    parameter_data["current_value"] = np.clip(
+      (
+        parameter_data["current_value"] +
+        (
+          np.sign(parameter_data["target_value"] - parameter_data["current_value"]) * (
+            (
+              (1 - parameter_data["speed_factor"]) * parameter_data["min_speed"] +
+              parameter_data["speed_factor"] * parameter_data["max_speed"]
+            )
+          )
+        )
+      ),
+      np.minimum(parameter_data["current_value"], parameter_data["target_value"]),
+      np.maximum(parameter_data["current_value"], parameter_data["target_value"])
+    )

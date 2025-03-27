@@ -1,9 +1,10 @@
-from PIL import ImageTk, Image, ImageDraw
+from PIL import Image, ImageDraw
 import tkinter as tk
 import pyautogui
 import shapely
 
 from engine.object import Object
+from engine.graphics import Sprite
 
 
 class ScreenChunk(Object):
@@ -52,22 +53,15 @@ class ScreenChunk(Object):
 
     # Take screenshot of the screen chunk
     screenshot = pyautogui.screenshot(region=(x, y, width, height))
-    # Make empty canvas
-    self.graphic_canvas = tk.Canvas(self.tk_obj, bg=self.tk_obj['bg'], width=width, height=height, bd=0, highlightthickness=0, cursor='none')
-    self.graphic_canvas.pack(padx=0, pady=0, side=tk.TOP)
 
-    # Apply the mask to the screenshot (Required for MacOS)
-    self.graphic_canvas.create_polygon(self.polygon, fill='black', outline='black', width=1)
-
-    # Mask screenshot to polygon (Works on Windows)
+    # Mask screenshot to polygon
     screenshot = screenshot.crop((0, 0, width, height))
     mask = Image.new('L', (width, height), 0)
     ImageDraw.Draw(mask).polygon(self.polygon, outline=255, fill=255)
     screenshot.putalpha(mask)
     
-    # convert to ImageTk format
-    self.chunk_image = ImageTk.PhotoImage(screenshot)
-    self.graphic_canvas.create_image(0, 0, image=self.chunk_image, anchor=tk.NW)
+    # Create sprite
+    Sprite(self, screenshot, 0, 0, anchor=tk.NW)
 
     self.lifetime_timer = 0
 

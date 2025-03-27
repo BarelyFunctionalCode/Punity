@@ -1,6 +1,7 @@
 import tkinter as tk
 
 from engine.object import Object
+from engine.graphics.shape import Polygon
 
 
 class Hole(Object):
@@ -20,11 +21,9 @@ class Hole(Object):
 
   def start(self):
     super().start()
-    # Make empty canvas
-    self.graphic_canvas = tk.Canvas(self.tk_obj, width=self.transform.width, height=self.transform.height, bg=self.tk_obj['bg'], bd=0, highlightthickness=0, cursor='none')
-    self.graphic_canvas.pack(padx=0, pady=0, side=tk.TOP)
-    # Draw hole polygon
-    self.graphic_canvas.create_polygon(self.hole_polygon, fill='black', outline=self.tk_obj['bg'])
+
+    # Create hole polygon
+    Polygon(self, self.hole_polygon, fill='black', outline=self.tk_obj['bg'])
     self.lifetime_timer = 0
 
   def update(self):
