@@ -3,7 +3,7 @@ import types
 
 from engine import Environment
 
-class_blacklist = ['Object', 'Base']
+class_blacklist = ['Object', 'Component']
 
 
 class Inspector:

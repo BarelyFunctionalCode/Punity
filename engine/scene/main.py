@@ -1,7 +1,6 @@
 import platform
 
-from engine import Environment
-from engine.object import Object
+from engine import Environment, Object
 
 from .border import Border
 from .editor import Editor

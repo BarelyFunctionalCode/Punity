@@ -1,11 +1,10 @@
 import math
 
-from engine import Environment
-from engine.component import Base
+from engine import Environment, Component
 from engine.math import Vector2
 
 
-class Movement(Base):
+class Movement(Component):
   def __init__(self):
     super().__init__()
     self.proxity_limit = 300

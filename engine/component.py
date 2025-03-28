@@ -1,4 +1,4 @@
-class Base:
+class Component:
   def __init__(self):
     super().__init__()
 

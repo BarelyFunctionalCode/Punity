@@ -16,6 +16,8 @@ class Transform:
 
   @position.setter
   def position(self, new_position):
+    if not isinstance(new_position, Vector2):
+      new_position = Vector2(new_position)
     self._last_position = Vector2(self.position)
     self._position = new_position
     # print(f"Setting position to {new_position} from {self._last_position}")

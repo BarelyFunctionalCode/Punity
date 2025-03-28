@@ -6,7 +6,7 @@ expressions = {
     (
       {
         "look_target": {
-          "target_value": np.array([0., 85., 1000.]),
+          "target_value": [-1., 0., 1.],
           "speed_factor": 1.0
         },
         "eye_open_factor": {
@@ -35,7 +35,7 @@ expressions = {
     (
       {
         "look_target": {
-          "target_value": np.array([140., 170., 1000.]),
+          "target_value": [1., 1., 1.],
           "speed_factor": 0.3
         }
       },
@@ -44,7 +44,7 @@ expressions = {
     (
       {
         "look_target": {
-          "target_value": np.array([0., 170., 1000.]),
+          "target_value": [-1., 1., 1.],
           "speed_factor": 0.3
         }
       },
@@ -53,8 +53,8 @@ expressions = {
     (
       {
         "look_target": {
-          "target_value": np.array([70., 85., 1000.]),
-          "speed_factor": 0.5
+          "target_value": [0., 0., 1.],
+          "speed_factor": 2.0
         },
         "eye_open_factor": {
           "target_value": 1.0,
@@ -71,7 +71,7 @@ expressions = {
     (
       {
         "look_target": {
-          "target_value": np.array([70., 85., 1000.]),
+          "target_value": [0., 0., 1.],
           "speed_factor": 0.7
         },
         "eye_open_factor": {
@@ -150,7 +150,7 @@ expressions = {
     (
       {
         "look_target": {
-          "target_value": np.array([70., 170., 1000.]),
+          "target_value": [0., 1., 1.],
           "speed_factor": 0.1
         },
         "look_target": {
@@ -178,16 +178,12 @@ expressions = {
     (
       {
         "look_target": {
-          "target_value": np.array([70., 85., 1000.]),
+          "target_value": [0., 0., 1.],
           "speed_factor": 1.0
         },
         "face_scale": {
           "target_value": 1.0,
           "speed_factor": 0.1
-        },
-        "face_position": {
-          "target_value": np.array([70., 85., 0]),
-          "speed_factor": 0.2
         },
       },
       0.5

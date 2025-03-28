@@ -1,6 +1,6 @@
 import tkinter as tk
 
-from engine.object import Object
+from engine import Object
 
 
 class Terminal(Object):

@@ -1,4 +1,4 @@
-from engine.object import Object
+from engine import Object
 from engine.math import Side
 
 

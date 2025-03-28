@@ -1,10 +1,10 @@
-from engine.component import Base
+from engine import Component
 from engine.math import Vector2
 
 
 GRAVITY = 3
 
-class Rigidbody(Base):
+class Rigidbody(Component):
   def __init__(self):
     self.use_gravity = True
     self.velocity = Vector2.zero

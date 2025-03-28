@@ -1,5 +1,4 @@
-from engine import Environment
-from engine.object import Object
+from engine import Environment, Object
 
 from assets.components.rigidbody import Rigidbody
 from assets.objects.hole import Hole

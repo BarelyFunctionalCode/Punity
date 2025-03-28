@@ -3,7 +3,7 @@ import tkinter as tk
 import pyautogui
 import shapely
 
-from engine.object import Object
+from engine import Object
 from engine.graphics import Sprite
 
 

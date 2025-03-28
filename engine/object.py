@@ -3,14 +3,13 @@ import time
 import numpy as np
 
 from engine import Environment
-from engine.component import Base
+from engine.component import Component
 from engine.transform import Transform
 from engine.math import Vector2
 from engine.graphics import TkRoot, TkWindow
 
 
-
-class Object(Base):
+class Object(Component):
   def __init__(self, parent=None, name="root", width=0, height=0, x=0, y=0, is_static=True):
     # Setting the parent and children
     self.parent = parent

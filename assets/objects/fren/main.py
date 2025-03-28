@@ -1,6 +1,6 @@
 from queue import Queue
 
-from engine.object import Object
+from engine import Object
 from engine.math import Vector2
 
 from assets.components.rigidbody import Rigidbody

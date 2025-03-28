@@ -1,15 +1,14 @@
 from queue import Queue
-import tkinter as tk
 import numpy as np
 import datetime as date
 
-from engine.component import Base
+from engine import Component
 from engine.graphics.shape import Polygon, Rectangle, Line
 
 from .expressions import expressions
 
 
-class Face(Base):
+class Face(Component):
   def __init__(self):
     self.is_face_active = False
     self.is_face_asleep = False
@@ -37,12 +36,13 @@ class Face(Base):
   def start(self):
     super().start()
     # Face Parameters
+    self.center = np.array([self.transform.width / 2, self.transform.height / 2.3, 0])
     self.face_parameters = {
       "look_target": {
-        "current_value": np.array([self.transform.width / 2, self.transform.height / 3, 1000.0]),
-        "target_value": np.array([self.transform.width / 2, self.transform.height / 3, 1000.0]),
-        "max_speed": 20,
-        "min_speed": 1,
+        "current_value": [0., 0., 1.],
+        "target_value": [0., 0., 1.],
+        "max_speed": .2,
+        "min_speed": .05,
         "speed_factor": 1.0
       },
       "eye_open_factor": {
@@ -161,10 +161,8 @@ class Face(Base):
     pupil_max_movement = np.array(eye_half_size - [pupil_radius, pupil_radius]).clip(0)
 
     # Calculate pupil position based on look direction
-    look_direction = (
-      (self.face_parameters["look_target"]["current_value"] - self.face_parameters["face_position"]["current_value"])) / \
-      (np.linalg.norm(self.face_parameters["look_target"]["current_value"] - self.face_parameters["face_position"]["current_value"])
-    )
+    look_target = np.array(self.face_parameters["look_target"]["current_value"], dtype=np.float64)
+    look_direction = look_target / np.linalg.norm(look_target)
     pupil_center = look_direction[:2] * eye_size * self.pupil_movement_factor
     pupil_center = np.clip(pupil_center, -pupil_max_movement, pupil_max_movement)
 
@@ -172,8 +170,8 @@ class Face(Base):
     eye_distance = 35.0 * self.face_parameters["face_scale"]["current_value"]
     eye_offset_pos = np.array([0,-30]) * self.face_parameters["face_scale"]["current_value"]
     eye_positions = [
-      self.face_parameters["face_position"]["current_value"][:2] - np.array([eye_distance, 0]) + eye_offset_pos + (look_direction[:2] * 70.0),
-      self.face_parameters["face_position"]["current_value"][:2] + np.array([eye_distance, 0]) + eye_offset_pos + (look_direction[:2] * 70.0)
+      self.center[:2] - np.array([eye_distance, 0]) + eye_offset_pos + (look_direction[:2] * 15.0),
+      self.center[:2] + np.array([eye_distance, 0]) + eye_offset_pos + (look_direction[:2] * 15.0)
     ]
 
     eye_ovals = [ (
@@ -215,7 +213,7 @@ class Face(Base):
     mouth_offset_pos = np.array([0, 45.0]) * self.face_parameters["face_scale"]["current_value"]
     mouth_center = np.array([0, 0])
     mouth_length = (50.0 + 50.0 * (1.0 - self.face_parameters["mouth_open_factor"]["current_value"])) * self.face_parameters["face_scale"]["current_value"]
-    mouth_start = self.face_parameters["face_position"]["current_value"][:2] + mouth_offset_pos + mouth_center - np.array([mouth_length / 2, 0])
+    mouth_start = self.center[:2] + mouth_offset_pos + mouth_center - np.array([mouth_length / 2, 0])
 
     def slope_mouth(x, value):
       return np.exp(-pow((x - (mouth_resolution / 2.0)) / (mouth_length / (3.0 - self.face_parameters["mouth_open_factor"]["current_value"])), 2.0)) * value
@@ -263,11 +261,13 @@ class Face(Base):
   def adjust_face_parameter(self, parameter):
     parameter_data = self.face_parameters[parameter]
     
+    current_value = parameter_data["current_value"] if type(parameter_data["current_value"]) is not list else np.array(parameter_data["current_value"])
+    target_value = parameter_data["target_value"] if type(parameter_data["target_value"]) is not list else np.array(parameter_data["target_value"])
     parameter_data["current_value"] = np.clip(
       (
         parameter_data["current_value"] +
         (
-          np.sign(parameter_data["target_value"] - parameter_data["current_value"]) * (
+          np.sign(target_value - current_value) * (
             (
               (1 - parameter_data["speed_factor"]) * parameter_data["min_speed"] +
               parameter_data["speed_factor"] * parameter_data["max_speed"]
@@ -275,6 +275,6 @@ class Face(Base):
           )
         )
       ),
-      np.minimum(parameter_data["current_value"], parameter_data["target_value"]),
-      np.maximum(parameter_data["current_value"], parameter_data["target_value"])
+      np.minimum(current_value, target_value),
+      np.maximum(current_value, target_value)
     )

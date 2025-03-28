@@ -1,6 +1,4 @@
-import tkinter as tk
-
-from engine.object import Object
+from engine import Object
 from engine.graphics.shape import Polygon
 
 
@@ -8,6 +6,7 @@ class Hole(Object):
   def __init__(self, parent, hole_polygon, x, y, lifetime=-1):
     self.hole_polygon = hole_polygon
     self.lifetime = lifetime
+    self.lifetime_timer = 0
 
     # Get min/max x/y values
     min_x = min(hole_polygon[::2])
@@ -24,7 +23,6 @@ class Hole(Object):
 
     # Create hole polygon
     Polygon(self, self.hole_polygon, fill='black', outline=self.tk_obj['bg'])
-    self.lifetime_timer = 0
 
   def update(self):
     super().update()
