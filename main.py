@@ -12,7 +12,5 @@ if __name__ == "__main__":
   # Create the fren object
   Fren(scene, 'hole_punch')
 
-  scene.tk_obj.after(5000, lambda: Toast("Hi! Welcome to PUnity.", 5000))
-
   # Run the main loop
   scene.begin()
