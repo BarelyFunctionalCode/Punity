@@ -10,7 +10,7 @@ from engine.graphics import TkRoot, TkWindow
 
 
 class Object(Component):
-  def __init__(self, parent=None, name="root", width=0, height=0, x=0, y=0, is_static=True):
+  def __init__(self, parent=None, name="root", width=0, height=0, x=0, y=0, is_static=True, **kwargs):
     # Setting the parent and children
     self.parent = parent
     self.children = np.array([])
@@ -30,7 +30,9 @@ class Object(Component):
     if parent == None and Environment.root != None: return
 
     # Setting default TK Window Options
-    self.tk_obj = TkWindow(parent.tk_obj) if parent != None else TkRoot()
+    embed = kwargs.get('embed', False)
+    container = kwargs.get('container', False)
+    self.tk_obj = TkWindow(parent.tk_obj, embed, container) if parent != None else TkRoot()
     self.tk_obj.title(f"punity_{self.name}")
     self.tk_obj.geometry(f"{width}x{height}+{x}+{y}")
     self.tk_obj.update_idletasks()
@@ -47,7 +49,7 @@ class Object(Component):
     self.images = {}
 
     # Init other sibling class instances
-    super().__init__()
+    super().__init__(**kwargs)
 
     # Adding object to Environment
     Environment.objects = np.append(Environment.objects, self)
@@ -87,6 +89,9 @@ class Object(Component):
       self.update()
       if self.tk_obj == None: return
 
+      # TODO: Last position should be set at the end of the update loop instead of the set position function
+
+
       # Check for collisions if the object is not static
       if not self.is_static:
         for obj in Environment.objects:
@@ -98,10 +103,14 @@ class Object(Component):
               obj.on_collision(-col_normal, self)
 
         # Update the position of the TK Window
+        if self.transform.did_move_this_frame:
+          self.transform.did_move_this_frame = False
+          delta_movement = self.transform.position - self.transform.last_position
+          for child in self.children:
+            child.transform.position = child.transform.position + delta_movement
         new_position = self.transform.position.astype(Vector2.int)
         self.tk_obj.update_idletasks()
         self.tk_obj.geometry(f"{self.transform.width}x{self.transform.height}+{new_position.x}+{new_position.y}")
-    # Update delta time
     self.last_update_time = time.time()
     self.tk_obj.after(10, self._update)
 

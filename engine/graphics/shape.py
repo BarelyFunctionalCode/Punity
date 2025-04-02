@@ -26,6 +26,12 @@ class _Shape():
     if "tags" in kwargs:
       self.tags = [*self.tags, *list(kwargs["tags"])]
       del kwargs["tags"]
+
+  def bind(self, event, callback):
+    self.parent.canvas.tag_bind(self.name, event, callback)
+    
+  def unbind(self, event):
+    self.parent.canvas.tag_unbind(self.name, event)
   
   def update(self, points):
     self.parent.canvas.coords(self.name, points)

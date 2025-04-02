@@ -29,6 +29,12 @@ class Text:
       **kwargs
     )
 
+  def bind(self, event, callback):
+    self.parent.canvas.tag_bind(self.name, event, callback)
+    
+  def unbind(self, event):
+    self.parent.canvas.tag_unbind(self.name, event)
+
   def update(self, text):
     self.parent.canvas.itemconfig(self.name, text=text)
 

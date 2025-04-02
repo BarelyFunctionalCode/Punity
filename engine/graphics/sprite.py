@@ -56,6 +56,12 @@ class Sprite:
       **kwargs
     )
 
+  def bind(self, event, callback):
+    self.parent.canvas.tag_bind(self.name, event, callback)
+    
+  def unbind(self, event):
+    self.parent.canvas.tag_unbind(self.name, event)
+
   def update(self, image, x=None, y=None):
     self.img = ImageTk.PhotoImage(image)
     self.parent.canvas.itemconfig(self.name, image=self.img)

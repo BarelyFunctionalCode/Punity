@@ -21,8 +21,13 @@ class TkRoot(tk.Tk):
     self.geometry("0x0+0+0")
 
 class TkWindow(tk.Toplevel):
-  def __init__(self, parent):
-    super().__init__(parent)
+  def __init__(self, parent, embed=False, container=False):
+    self.parent = parent
+    use = ''
+    if embed:
+      use = parent.winfo_id()
+      self.parent = None
+    super().__init__(self.parent, use=use, container=container)
     self.overrideredirect(True)
     self.update_idletasks()
     self.wm_attributes("-topmost", True)
