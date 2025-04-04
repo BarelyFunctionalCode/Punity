@@ -12,6 +12,7 @@ from engine.graphics import TkRoot, TkWindow
 class Object(Component):
   def __init__(self, parent=None, name="root", width=0, height=0, x=0, y=0, is_static=True, **kwargs):
     # Setting the parent and children
+    self._is_first_frame = True
     self.parent = parent
     self.children = np.array([])
     if parent != None:
@@ -56,7 +57,6 @@ class Object(Component):
 
     # Run start function, and start the update loop
     self.start()
-    self._update()
 
   # Time between the last update and the current update
   @property
@@ -64,7 +64,8 @@ class Object(Component):
     return (time.time() - self.last_update_time) * 1000
   
   # Update loop for the object
-  def _update(self):
+  def _update(self, parent_delta_movement = Vector2([0, 0])):
+    if self._is_first_frame: parent_delta_movement = Vector2([0, 0])
     if not self.paused:
       if self.tk_obj == None: return
       # Fading logic
@@ -86,12 +87,15 @@ class Object(Component):
             self._is_fading = False
 
       # Run update functionality for derived class and sibling classes
+      self.transform.position = self.transform.position + parent_delta_movement
+      self.transform.did_move_this_frame = False
+      old_position = self.transform.position
       self.update()
       if self.tk_obj == None: return
 
-      # TODO: Last position should be set at the end of the update loop instead of the set position function
+      delta_movement = Vector2([0, 0])
 
-
+      #TODO: Move collision check to different function that runs after all objects have been updated
       # Check for collisions if the object is not static
       if not self.is_static:
         for obj in Environment.objects:
@@ -99,20 +103,24 @@ class Object(Component):
           col_normal = self._collision_check(obj)
           if col_normal != None:
             self.on_collision(col_normal, obj)
-            if not obj.is_static:
-              obj.on_collision(-col_normal, self)
+            # if not obj.is_static:
+            #   obj.on_collision(-col_normal, self)
 
         # Update the position of the TK Window
         if self.transform.did_move_this_frame:
           self.transform.did_move_this_frame = False
-          delta_movement = self.transform.position - self.transform.last_position
-          for child in self.children:
-            child.transform.position = child.transform.position + delta_movement
-        new_position = self.transform.position.astype(Vector2.int)
-        self.tk_obj.update_idletasks()
-        self.tk_obj.geometry(f"{self.transform.width}x{self.transform.height}+{new_position.x}+{new_position.y}")
+          delta_movement = self.transform.position - old_position
+
+      # Update the position of the children
+      if len(self.children) > 0:
+        for child in self.children:
+          child._update(parent_delta_movement + delta_movement)
+
+      new_position = self.transform.position.astype(Vector2.int)
+      self.tk_obj.update_idletasks()
+      self.tk_obj.geometry(f"{self.transform.width}x{self.transform.height}+{new_position.x}+{new_position.y}")
     self.last_update_time = time.time()
-    self.tk_obj.after(10, self._update)
+    if self._is_first_frame: self._is_first_frame = False
 
   # Functions to be extended by derived/sibling classes
   def start(self):
@@ -199,7 +207,7 @@ class Object(Component):
   # Collision Response
   def on_collision(self, col_normal, other_object):
     # Get the collision vector and apply a response to the collision to keep the objects from overlapping
-    col_vec = self.transform.position - self.transform.last_position
+    col_vec = self.transform.direction
 
     collision_response = col_normal * col_vec.magnitude
     # print(f"Base Collision: {col_normal} with {other_object.name}; {self.transform.position} {other_object.transform.position}") 

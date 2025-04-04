@@ -25,14 +25,26 @@ class Inspector:
     self.pane_heights = {}
     self.update_inspector()
   
+  def format_value(self, value):
+    if isinstance(value, str):
+      return value
+    elif isinstance(value, bool):
+      return 'True' if value else 'False'
+    elif isinstance(value, (list, tuple)):
+      return ', '.join([str(v) for v in value])
+    elif isinstance(value, (int, float)):
+      return f"{value:.2f}"
+    else:
+      return value
+
   def create_label(self, pane, is_title=False, name='', value=''):
     max_name_length = 20
     name_truncated = name[:max_name_length-4] + '...' if len(name) > max_name_length else name
     spacing = ' ' * (max_name_length - len(name_truncated))
     self.obj_info[pane + '_' +name] = tk.Label(
       self.obj_info[pane + '_pane'],
-      text=f"{name_truncated}{spacing}{value}" if not is_title else pane[0].upper() + pane[1:],
-      width=30,
+      text=f"{name_truncated}{spacing}{self.format_value(value)}" if not is_title else pane[0].upper() + pane[1:],
+      width=40,
       pady=1,
       anchor='w',
       background='#777' if is_title else self.obj_info[pane + '_pane']['background'],
@@ -52,7 +64,7 @@ class Inspector:
     max_name_length = 20
     name_truncated = name[:max_name_length-4] + '...' if len(name) > max_name_length else name
     spacing = ' ' * (max_name_length - len(name_truncated))
-    self.obj_info[pane + '_' + name].config(text=f"{name_truncated}{spacing}{value}")
+    self.obj_info[pane + '_' + name].config(text=f"{name_truncated}{spacing}{self.format_value(value)}")
 
   def create_pane(self, name, make_title=False):
     pane_name = name + '_pane'
@@ -73,7 +85,7 @@ class Inspector:
     self.update_label('base_object', 'Static', self.active_obj.is_static)
     self.update_label('base_object', 'Collisions', self.active_obj.collision_enabled)
     self.update_label('transform', 'Position', self.active_obj.transform.position)
-    self.update_label('transform', 'Last Position', self.active_obj.transform.last_position)
+    self.update_label('transform', 'Direction', self.active_obj.transform.direction)
     self.update_label('transform', 'Size', f"{self.active_obj.transform.width} x {self.active_obj.transform.height}")
 
     for pane_name in [name[:-5] for name in self.obj_info.keys() if name != 'master_pane' and '_pane' in name]:
@@ -115,7 +127,7 @@ class Inspector:
     # Transform information
     self.create_pane('transform', True)
     self.create_label('transform', False, 'Position', self.active_obj.transform.position)
-    self.create_label('transform', False, 'Last Position', self.active_obj.transform.last_position)
+    self.create_label('transform', False, 'Direction', self.active_obj.transform.direction)
     self.create_label('transform', False, 'Size', f"{self.active_obj.transform.width} x {self.active_obj.transform.height}")
 
     self.create_pane('space')

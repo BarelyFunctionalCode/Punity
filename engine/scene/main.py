@@ -22,6 +22,14 @@ class Scene(Object):
     # Create the editor
     if create_editor:
       self.editor = Editor(self, True)
+    
+    self._update()
+
+  def _update(self):
+    for obj in self.children:
+      obj._update()
+
+    self.tk_obj.after(10, self._update)
 
   # Begins the main loop for the root object
   def begin(self):

@@ -25,8 +25,8 @@ class Transform:
     # print(f"Setting position to {new_position} from {self._last_position}")
 
   @property
-  def last_position(self):
-    return self._last_position
+  def direction(self):
+    return self._position - self._last_position
 
   @property
   def width(self):

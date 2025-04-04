@@ -39,6 +39,8 @@ class Vector2:
     return Vector2(-self._vec)
 
   def __add__(self, other):
+    if type(other) != Vector2:
+      other = Vector2(other)
     return Vector2(self._vec + other._vec)
   
   def __sub__(self, other):
