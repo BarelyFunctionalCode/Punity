@@ -143,8 +143,8 @@ The following functions are defined in the base class `Object` and need to conta
 # Road to 1.0 demo
 
 - A hole appears after that part of the screen falls away in pieces
-- Fren appears in hole and comes out (done)
-- When a non-fullscreen window is opened, it gets Fren's attention
+- ~~Fren appears in hole and comes out~~
+- ~~When a non-fullscreen window is opened, it gets Fren's attention~~
 - He phases into the window and disappears
 - Period where the window shows various glitches
 - Lifting up the bottom of the window like a garage door, Fren exits
@@ -154,16 +154,16 @@ The following functions are defined in the base class `Object` and need to conta
 
 ### Features
 
-- Object layer management
-  - Layers: Background, Foreground, Top (done)
-- Program detection and tracking
-  - Detect when a new application on the PC is started
-  - Keep track of running applications with their window sizes and positions
-- Fren Fade In/Out
+- ~~Object layer management~~
+  - ~~Layers: Background, Foreground, Top~~
+- ~~Program detection and tracking~~
+  - ~~Detect when a new application on the PC is started~~
+  - ~~Keep track of running applications with their window sizes and positions~~
+- ~~Fren Fade In/Out~~
 
 ### Objects
 
-- Screen Chunk (done)
+- ~~Screen Chunk~~
   - Layer: Top
   - Inputs: polygon, position
   - Process:
@@ -171,7 +171,7 @@ The following functions are defined in the base class `Object` and need to conta
     - Take a screenshot of the screen
     - crop the screenshot based on the polygon
     - Create canvas with an image of the clipped screenshot
-- Hole (done)
+- ~~Hole~~
   - Layer: Background
   - Inputs: polygon, position, lifespan
   - Process:

@@ -1,6 +1,6 @@
 from queue import Queue
 
-from engine import Object
+from engine import Object, Environment
 from engine.math import Vector2
 
 from assets.components.rigidbody import Rigidbody
@@ -44,6 +44,7 @@ class Fren(Object, Face, Movement, Rigidbody):
     if self.entrance:
       self.entrance = self.entrance(self.parent, self)
 
+    Environment.new_application_event.add_listener(self.new_application_trigger)
     # self.tk_obj.after(12000, lambda: self.enqueue_update_text("I make big shid, and I'm not sorry.\n\n\n💩"))
 
   def update(self):
@@ -72,16 +73,24 @@ class Fren(Object, Face, Movement, Rigidbody):
 
     if not self.terminal and not self.terminal_update_queue.empty():
       terminal_position = self.transform.position.astype(int) - Vector2([0, 100])
-      self.terminal = Terminal(self, terminal_position.x, terminal_position.y, self.terminal_update_queue, self.talking_queue)
+      self.terminal = Terminal(self, terminal_position.x, terminal_position.y, 5000, self.terminal_update_queue, self.talking_queue)
 
     if self.is_face_asleep and self.move_mode != 'sleep':
       self.set_move_mode('sleep')
 
   def wake_up(self):
+    if not self.is_face_asleep:
+      return
     self.asleep_timer = 0
     self.fade_in()
     self.set_face_expression("wake")
 
   # Used by the assistant to update the terminal text
   def enqueue_update_text(self, text):
+    self.wake_up()
     self.terminal_update_queue.put(text)
+
+  # Behavior triggers
+  
+  def new_application_trigger(self, app_pid):
+    self.enqueue_update_text(f"New application detected: {app_pid}")

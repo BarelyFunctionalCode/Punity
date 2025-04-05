@@ -2,6 +2,7 @@ import numpy as np
 import pyautogui
 
 from engine.math import Vector2
+from engine.event import Event
 
 from .external_application import update_applications
 
@@ -18,9 +19,10 @@ class Environment:
     self.objects = np.array([])
     self.root = None
     self.applications = {}
+    self.new_application_event = Event() 
 
   def update(self):
-    update_applications(self.applications)
+    update_applications(self.applications, self.new_application_event)
     self.root.tk_obj.after(100, self.update)
 
   def set_root(self, root):

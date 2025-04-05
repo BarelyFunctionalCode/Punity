@@ -17,12 +17,13 @@ class ExternalApplication:
     self.last_update = time.time()
 
 # Gets the most recent list of applications and updates the applications dictionary
-def update_applications(applications):
+def update_applications(applications, new_application_event):
   current_applications = get_applications()
   for app in current_applications:
     if app['pid'] not in applications:
       # Create the application if it doesn't exist
       applications[app['pid']] = ExternalApplication(**app)
+      new_application_event.invoke(app_pid=app['pid'])
       # print(f'\"{app['name']}\" created at {applications[app['pid']].position} with size {applications[app['pid']].size} and pid {applications[app['pid']].pid} ({applications[app['pid']].title})')
     else:
       # Update the application if it does exist
