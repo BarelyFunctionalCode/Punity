@@ -148,7 +148,7 @@ The following functions are defined in the base class `Object` and need to conta
 - He phases into the window and disappears
 - Period where the window shows various glitches
 - Lifting up the bottom of the window like a garage door, Fren exits
-- When the window comes back down it is greyed out and has a popup window on it
+- When the window comes back down ~~it is greyed out and has a popup window on it~~
 
 ## TODO
 
