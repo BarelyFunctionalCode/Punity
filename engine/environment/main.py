@@ -4,7 +4,8 @@ import pyautogui
 from engine.math import Vector2
 from engine.event import Event
 
-from .external_application import update_applications, add_input_event_monitor as _add_input_event_monitor
+from .external_application import update_applications
+from .system import add_input_event_monitor
 
 
 class Environment:
@@ -31,8 +32,8 @@ class Environment:
     self.root = root
     self.update()
 
-  def add_input_event_monitor(self):
-    _add_input_event_monitor(self, self.new_input_event)
+  def start_input_event_monitor(self):
+    add_input_event_monitor(self, self.new_input_event)
   
   def get_object(self, name):
     for obj in self.objects:
