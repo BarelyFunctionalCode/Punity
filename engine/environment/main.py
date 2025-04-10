@@ -4,7 +4,7 @@ import pyautogui
 from engine.math import Vector2
 from engine.event import Event
 
-from .external_application import update_applications
+from .external_application import update_applications, add_input_event_monitor as _add_input_event_monitor
 
 
 class Environment:
@@ -19,7 +19,9 @@ class Environment:
     self.objects = np.array([])
     self.root = None
     self.applications = {}
-    self.new_application_event = Event() 
+    self.new_application_event = Event()
+    self.mouse_position = Vector2([0, 0])
+    self.new_input_event = Event()
 
   def update(self):
     update_applications(self.applications, self.new_application_event)
@@ -29,9 +31,8 @@ class Environment:
     self.root = root
     self.update()
 
-  @property
-  def mouse_position(self):
-    return Vector2(pyautogui.position())
+  def add_input_event_monitor(self):
+    _add_input_event_monitor(self, self.new_input_event)
   
   def get_object(self, name):
     for obj in self.objects:

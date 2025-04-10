@@ -4,7 +4,7 @@ import platform
 if platform.system() == 'Windows':
   from .windows import get_applications
 else:
-  from .macos import get_applications
+  from .macos import get_applications, add_input_event_monitor as _add_input_event_monitor
 
 
 class ExternalApplication:
@@ -15,6 +15,9 @@ class ExternalApplication:
     self.position = position
     self.size = size
     self.last_update = time.time()
+
+def add_input_event_monitor(env, p_event):
+  _add_input_event_monitor(env, p_event)
 
 # Gets the most recent list of applications and updates the applications dictionary
 def update_applications(applications, new_application_event):

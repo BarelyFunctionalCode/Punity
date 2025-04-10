@@ -16,6 +16,8 @@ class Scene(Object):
       # Set application activation policy to not allow menubar, dock, or application focus
       import AppKit
       AppKit.NSApp.setActivationPolicy_(AppKit.NSApplicationActivationPolicyProhibited)
+      
+    Environment.add_input_event_monitor()
 
     Border(self, Environment.width, Environment.height, Environment.x, Environment.y, 50)
 

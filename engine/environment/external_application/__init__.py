@@ -1,1 +1,1 @@
-from .main import ExternalApplication, update_applications
+from .main import ExternalApplication, update_applications, add_input_event_monitor

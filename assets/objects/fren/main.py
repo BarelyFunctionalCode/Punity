@@ -45,6 +45,7 @@ class Fren(Object, Face, Movement, Rigidbody):
       self.entrance = self.entrance(self.parent, self)
 
     Environment.new_application_event.add_listener(self.new_application_trigger)
+    Environment.new_input_event.add_listener(self.new_input_event_trigger)
     # self.tk_obj.after(12000, lambda: self.enqueue_update_text("I make big shid, and I'm not sorry.\n\n\n💩"))
 
   def update(self):
@@ -94,3 +95,6 @@ class Fren(Object, Face, Movement, Rigidbody):
   
   def new_application_trigger(self, app_pid):
     self.enqueue_update_text(f"New application detected: {app_pid}")
+
+  def new_input_event_trigger(self, event_data):
+    print(event_data)
