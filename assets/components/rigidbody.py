@@ -5,16 +5,16 @@ from engine.math import Vector2
 GRAVITY = 3
 
 class Rigidbody(Component):
-  def __init__(self):
-    self.use_gravity = True
+  def __init__(self, **kwargs):
+    self.use_gravity = kwargs.get('use_gravity', True)
+    self.drag = kwargs.get('drag', 0.05)
+    self.mass = kwargs.get('mass', 1.0)
+    self.bounciness = kwargs.get('bounciness', 1.0)
+    self.gravity_modifier = kwargs.get('gravity_modifier', 1.0)
+    self.max_speed = kwargs.get('max_speed', 100.0)
     self.velocity = Vector2.zero
     self.acceleration = Vector2.zero
-    self.drag = 0.05
-    self.max_speed = 100
-    self.mass = 1
-    self.bounciness = 1.0
-    self.gravity_modifier = 1.0
-    super().__init__()
+    super().__init__(**kwargs)
 
   def start(self):
     super().start()

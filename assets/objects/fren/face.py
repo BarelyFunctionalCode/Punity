@@ -9,7 +9,7 @@ from .expressions import expressions
 
 
 class Face(Component):
-  def __init__(self):
+  def __init__(self, **kwargs):
     self.is_face_active = False
     self.is_face_asleep = False
     self.current_expression = None

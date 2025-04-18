@@ -12,7 +12,7 @@ class Leech(Component):
     self.attached_app = None
     self.is_leech_attached = False
     self.lerp_speed = 0.005
-    super().__init__()
+    super().__init__(**kwargs)
 
   def start(self):
     super().start()

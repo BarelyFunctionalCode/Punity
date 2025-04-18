@@ -5,19 +5,29 @@ from engine.math import Vector2
 
 
 class Movement(Component):
-  def __init__(self):
-    super().__init__()
+  def __init__(self, **kwargs):
     self.proxity_limit = 300
     self.normal_move_speed = 50
     self.asleep_move_speed = 10
 
     self.move_mode = ''
+    self.default_move_mode = 'idle'
+    self.default_drag = self.drag if hasattr(self, 'drag') else 0.05
+    self.default_gravity = self.use_gravity if hasattr(self, 'use_gravity') else True
+    super().__init__(**kwargs)
 
   def set_move_mode(self, mode):
     self.move_mode = mode
 
-    if mode == 'sleep':
-      self.sleep_drift()
+    move_modes = {
+      'sleep': self.sleep_drift,
+      'idle': self.reset,
+    }
+
+    if mode in move_modes:
+      move_modes[mode]()
+    else:
+      self.reset()
 
   def update(self):
     super().update()
@@ -44,6 +54,10 @@ class Movement(Component):
     force = math.trunc(self.normal_move_speed * force_factor)
     self.apply_force(distance.normalized * force)
   
+  def reset(self):
+    self.use_gravity = self.default_gravity
+    self.drag = self.default_drag
+
   # Disable gravity and drag and then apply a small force in a random direction
   def sleep_drift(self):
     self.use_gravity = False

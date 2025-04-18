@@ -12,7 +12,7 @@ from .face import Face
 from . import actions
 
 
-class Fren(Object, Face, Movement, Rigidbody):
+class Fren(Object, Rigidbody, Face, Movement):
   def __init__(self, parent, entrance=None):
     # Setting up the entrance that's defined
     self.face_polygon = [20,0, 120,0, 140,20, 145,90, 120,140, 90,160, 50,160, 20,140, -5,90, 0,20, 20,0,]
@@ -26,20 +26,21 @@ class Fren(Object, Face, Movement, Rigidbody):
 
     self.is_busy = False
     self.inactivity_timer = 0
-    self.inactivity_timeout = 2000
+    self.inactivity_timeout = 10000
     self.asleep_timer = 0
     self.asleep_fade_timeout = 20000
     self.terminal_despawn_timer = 0
     self.terminal_despawn_timeout = 5000
     self.terminal = None
     self.terminal_update_queue = Queue()
-    super().__init__(parent, 'fren', 140, 170, x, y, False)
+
+    kwargs = {
+      'use_gravity': False,
+    }
+    super().__init__(parent, 'fren', 140, 170, x, y, False, **kwargs)
     
   def start(self):
     super().start()
-    # Initializing gravity as disabled
-    self.use_gravity = False
-
     # Run the entrance
     if self.entrance:
       self.entrance = self.entrance(self.parent, self)
@@ -74,13 +75,15 @@ class Fren(Object, Face, Movement, Rigidbody):
 
     if not self.terminal and not self.terminal_update_queue.empty():
       terminal_position = self.transform.position.astype(int) - Vector2([0, 100])
-      self.terminal = Terminal(self, terminal_position.x, terminal_position.y, 5000, self.terminal_update_queue, self.talking_queue)
+      self.terminal = Terminal(Environment.root, terminal_position.x, terminal_position.y, 5000, self.terminal_update_queue, self.talking_queue)
 
     if self.is_face_asleep and self.move_mode != 'sleep':
       self.set_move_mode('sleep')
+    elif not self.is_face_asleep and self.move_mode == 'sleep':
+      self.set_move_mode('idle')
 
   def wake_up(self):
-    if not self.is_face_asleep:
+    if not self.is_face_asleep or self.is_busy:
       return
     self.asleep_timer = 0
     self.fade_in()
@@ -97,4 +100,5 @@ class Fren(Object, Face, Movement, Rigidbody):
     self.enqueue_update_text(f"New application detected: {app_pid}\n")
 
   def new_input_event_trigger(self, event_data):
-    print(event_data)
+    # print(event_data)
+    pass
