@@ -15,6 +15,7 @@ def get_applications():
 
   for window in windows:
     pid = window[Quartz.kCGWindowOwnerPID]
+    number = window[Quartz.kCGWindowNumber]
     name = window[Quartz.kCGWindowOwnerName] 
     title = window[Quartz.kCGWindowName] if Quartz.kCGWindowName in window else ""
     width = window[Quartz.kCGWindowBounds]['Width']
@@ -25,6 +26,7 @@ def get_applications():
     if name not in application_name_blacklist and y > 0 and width > 100 and height > 100 and title != "" and "punity_" not in title:
       applications.append({
         'pid': pid,
+        'number': number,
         'name': name,
         'title': title,
         'size': Vector2([width, height]),

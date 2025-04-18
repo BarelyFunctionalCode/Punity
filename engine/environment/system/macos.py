@@ -5,7 +5,19 @@ from engine.math import Vector2
 
 def add_input_event_monitor(env, p_event):
   def handle_event(event: AppKit.NSEvent):
-    event_data = {'timestamp': time.time()}
+    window_number = event.windowNumber()
+    pid = -1
+    for app in env.applications.values():
+      if app.number == window_number:
+        pid = app.pid
+        break
+    
+    if pid != -1:
+      env.active_application_pid = pid
+
+    event_data = {
+      'timestamp': time.time(),
+    }
     if event.type() == AppKit.NSEventTypeMouseMoved:
       pos = AppKit.NSEvent.mouseLocation()
       pos_list = [pos.x, env.height - pos.y]

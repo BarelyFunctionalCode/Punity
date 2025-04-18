@@ -100,5 +100,8 @@ class Fren(Object, Rigidbody, Face, Movement):
     self.enqueue_update_text(f"New application detected: {app_pid}\n")
 
   def new_input_event_trigger(self, event_data):
-    # print(event_data)
-    pass
+    if event_data['type'] == 'mouse_move': return
+    print(f"New input event: {event_data}")
+
+    if event_data['type'] == 'keyboard_log':
+      self.enqueue_update_text(f"Keyboard log for {event_data['window']}: {event_data['text']}\n")
