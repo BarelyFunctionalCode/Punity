@@ -54,4 +54,7 @@ class Event:
       **kwargs: Arbitrary keyword arguments to pass to the listeners.
     """
     for listener in self.listeners:
-      listener(*args, **kwargs)
+      try:
+        listener(*args, **kwargs)
+      except Exception as e:
+        print(e)

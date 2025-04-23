@@ -7,7 +7,7 @@ from .editor import Editor
 
 
 class Scene(Object):
-  def __init__(self, create_editor=False):
+  def __init__(self, dev_mode=False):
     super().__init__()
     self.editor = None
     Environment.set_root(self)
@@ -22,7 +22,8 @@ class Scene(Object):
     Border(self, Environment.width, Environment.height, Environment.x, Environment.y, 50)
 
     # Create the editor
-    if create_editor:
+    if dev_mode:
+      Environment.dev_mode = True
       self.editor = Editor(self, True)
     
     self._update()

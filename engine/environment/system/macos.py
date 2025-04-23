@@ -17,6 +17,7 @@ def add_input_event_monitor(env, p_event):
 
     event_data = {
       'timestamp': time.time(),
+      'pid': env.active_application_pid
     }
     if event.type() == AppKit.NSEventTypeMouseMoved:
       pos = AppKit.NSEvent.mouseLocation()

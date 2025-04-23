@@ -8,11 +8,12 @@ from assets.objects.terminal import Terminal
 
 
 from .movement import Movement
+from .brain import Brain
 from .face import Face
 from . import actions
 
 
-class Fren(Object, Rigidbody, Face, Movement):
+class Fren(Object, Rigidbody, Brain, Face, Movement):
   def __init__(self, parent, entrance=None):
     # Setting up the entrance that's defined
     self.face_polygon = [20,0, 120,0, 140,20, 145,90, 120,140, 90,160, 50,160, 20,140, -5,90, 0,20, 20,0,]
@@ -47,7 +48,6 @@ class Fren(Object, Rigidbody, Face, Movement):
 
     # Environment event listeners
     Environment.new_application_event.add_listener(self.new_application_trigger)
-    Environment.new_input_event.add_listener(self.new_input_event_trigger)
 
   def update(self):
     super().update()
@@ -95,13 +95,6 @@ class Fren(Object, Rigidbody, Face, Movement):
     self.terminal_update_queue.put(text)
 
   # Behavior triggers
-  
   def new_application_trigger(self, app_pid):
-    self.enqueue_update_text(f"New application detected: {app_pid}\n")
-
-  def new_input_event_trigger(self, event_data):
-    if event_data['type'] == 'mouse_move': return
-    print(f"New input event: {event_data}")
-
-    if event_data['type'] == 'keyboard_log':
-      self.enqueue_update_text(f"Keyboard log for {event_data['window']}: {event_data['text']}\n")
+    # self.enqueue_update_text(f"New application detected: {app_pid}\n")
+    pass

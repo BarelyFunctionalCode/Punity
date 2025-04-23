@@ -13,6 +13,7 @@ class Environment:
   def __init__(self):
     size = pyautogui.size()
 
+    self.dev_mode = False
     self.x = 0
     self.y = 25
     self.width = size.width
@@ -33,10 +34,13 @@ class Environment:
     self.keyboard_new_log_timeout = 20
     self.keyboard_last_event_time = 0
     self.keyboard_current_log = ''
+    self.keyboard_current_log_window = -1
     self.keyboard_log_history = []
 
   def update(self):
     update_applications(self.applications, self.new_application_event)
+
+    # TODO: If current keyboard log has sat for log enough, send event for current log and start new one
     self.root.tk_obj.after(100, self.update)
 
   def set_root(self, root):
@@ -70,29 +74,29 @@ class Environment:
       self.keyboard_last_event_time = event_data['timestamp']
 
       # If enough time has passed since the last key event, treat it as a new log
-      if time.time() - self.keyboard_last_event_time > self.keyboard_new_log_timeout:
-        self.keyboard_log_history.append(self.keyboard_current_log)
-        self.keyboard_current_log = ''
-
+      # If the active application has changed since the last keyboard input, treat it as a new log
       # Enter key triggers an event
-      if event_data['key'] == '\r':
-        if len(self.keyboard_current_log) == 0:
-          return
+      if len(self.keyboard_current_log) != 0 and (time.time() - self.keyboard_last_event_time > self.keyboard_new_log_timeout or \
+          self.keyboard_current_log_window != self.active_application_pid or \
+          event_data['key'] == '\r') :
         self.keyboard_log_history.append(self.keyboard_current_log)
         self.keyboard_current_log = ''
         self.new_input_event.invoke({
           'timestamp': event_data['timestamp'],
           'type': 'keyboard_log',
           'text': self.keyboard_log_history[-1],
-          'window': self.applications[self.active_application_pid].name if self.active_application_pid != -1 else 'Unknown',
+          'pid': self.keyboard_current_log_window,
         })
+      if event_data['key'] == '\r': return
       # Handle other keys
-      elif event_data['key'] == '\x7f': # Backspace
+      if event_data['key'] == '\x7f': # Backspace
         if len(self.keyboard_current_log) > 0:
           self.keyboard_current_log = self.keyboard_current_log[:-1]
       elif event_data['key'] == '\x1b' or event_data['key'] == '\x03' or event_data['key'] == '\x18': # Escape or Ctrl+C or Ctrl+X
         self.keyboard_current_log = ''
       else:
         self.keyboard_current_log += event_data['key']
+      
+      self.keyboard_current_log_window = self.active_application_pid
 
 Instance = Environment()
