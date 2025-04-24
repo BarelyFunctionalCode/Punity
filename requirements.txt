@@ -2,6 +2,7 @@ numpy
 pillow
 pyautogui
 python-xlib
+requests
 shapely
 pywinctl
 py2app

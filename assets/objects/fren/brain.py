@@ -2,6 +2,10 @@ import tkinter as tk
 
 from engine import Component, Environment
 
+from assets.objects.toast import Toast
+
+from .ai_interface import analyze_data
+
 class BrainFart:
   def __init__(self):
     self.window = tk.Toplevel()
@@ -29,9 +33,9 @@ class Brain(Component):
     self.inactivity_timer = 0
 
     self.brain_fart = None
-    if Environment.dev_mode:
-      self.brain_fart = BrainFart()
-      self.brain_fart.update("BrainFart Initialized")
+    # if Environment.dev_mode:
+    #   self.brain_fart = BrainFart()
+    #   self.brain_fart.update("BrainFart Initialized")
     
     super().__init__()
 
@@ -48,8 +52,10 @@ class Brain(Component):
       self.last_event_pid = -1
       self.last_event_time = 0
 
+      activity_insights = analyze_data("summarize_activity", self.get_all_app_info())
+      print(activity_insights)
       if self.brain_fart:
-        self.brain_fart.update(self.get_dev_info())
+        self.brain_fart.update(activity_insights)
     else:
       self.inactivity_timer += self.delta_time
 
@@ -85,22 +91,23 @@ class Brain(Component):
     self.inactivity_timer = 0
 
 
-  def get_dev_info(self):
-    text = 'App Name | App Title | Activity Ratio\n'
+  def get_all_app_info(self):
+    text = '#### App Activity Breakdown\n'
     text += '----------------------\n'
     total_time = 0
     for pid in self.data['apps']:
       total_time += self.data['apps'][pid]['activity_time']
     for pid in self.data['apps']:
       ratio = self.data['apps'][pid]['activity_time'] / total_time
-      text += f"{self.data['apps'][pid]['app_name']} | {self.data['apps'][pid]['app_title']} | {ratio:.2%}\n"
-    text += f"----------------------\nTotal Time: {total_time}\n\n"
+      text += f"Name: {self.data['apps'][pid]['app_name']}, Title: {self.data['apps'][pid]['app_title']}, Usage Ratio: {ratio:.2%}\n"
+    text += f"\nTotal User Time: {total_time} seconds\n\n"
 
+    text += '#### App User Inputs\n'
     for pid in self.data['apps']:
       if len(self.data['apps'][pid]['raw_text_data']) > 0:
-        text += f"Raw Text Data for {self.data['apps'][pid]['app_name']}:\n"
+        text += f"##### {self.data['apps'][pid]['app_name']}\n"
         for line in self.data['apps'][pid]['raw_text_data']:
           text += f"{line}\n"
         text += "\n"
 
-    return text
+    return text  
