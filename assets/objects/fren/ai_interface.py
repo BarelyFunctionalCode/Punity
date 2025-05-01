@@ -30,8 +30,8 @@ def generate_response(prompt):
     # Send the request
 
     if Environment.dev_mode:
-        Toast('Hitting AI API', 10000)
-        
+      Toast('Hitting AI API', 10000)
+
     response = requests.post(url, headers=headers, json=data)
     # Check if the request was successful
     if response.status_code == 200:
@@ -43,6 +43,7 @@ def generate_response(prompt):
     else:
         # Handle error
         print(f"Error: {response.status_code} - {response.text}")
+        return None
 
 prompts = {
 "app_insight": lambda app_data: \

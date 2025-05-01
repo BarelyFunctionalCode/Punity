@@ -34,13 +34,14 @@ class Brain(Component):
       'activities': []
     }
 
-    self.is_ai_processing_lock = threading.Lock()
+    self.is_ai_processing_locked = False
 
     self.last_event_pid = -1
     self.last_event_time = 0
 
-    with open('temp.json', 'w') as f:
-      json.dump([], f)
+    if Environment.dev_mode:
+      with open('temp.json', 'w') as f:
+        json.dump([], f)
 
     # Event that is triggered after an app insight is generated and stored
     self.new_app_insight_event = Event()
@@ -137,55 +138,51 @@ class Brain(Component):
 
   def _inactivity_event(self, event_data):
     # Get trigger an app insight for the app that was last active
-    with open('temp.json', 'r') as f:
-      temp_data = json.load(f)
-    with open('temp.json', 'w') as f:
-      temp_data.append(self.data)
-      json.dump(temp_data, f, indent=2)
+    if Environment.dev_mode:
+      with open('temp.json', 'r') as f:
+        temp_data = json.load(f)
+      with open('temp.json', 'w') as f:
+        temp_data.append(self.data)
+        json.dump(temp_data, f, indent=2)
     pid = event_data['pid']
     self._get_app_insight(pid)
     
   def _get_app_insight(self, pid):
-    if self.is_ai_processing_lock.locked():
-      print(f"AI is already processing data, skipping app insight for {self.data['apps'][pid]['app_name']}")
-      return
-    
-    self.is_ai_processing_lock.acquire()
-
-    # Data that is not included in AI prompt
-    ignore_keys = ['total_clicks', 'last_active_time', 'insight']
     if pid not in self.data['apps']:
-      return None
-    
-    # Check if app insight cooldown has passed
-    print(f"Getting insight for {self.data['apps'][pid]['app_name']}")
+      print(f"App {pid} not found in data, skipping insight")
+      return
     if self.data['apps'][pid]['insight']['value'] and \
         time.time() - self.data['apps'][pid]['insight']['timestamp'] < self.app_insight_cooldown:
       print(f"Insight for {self.data['apps'][pid]['app_name']} is still valid")
       return
+    if self.is_ai_processing_locked:
+      print(f"AI is already processing data, skipping app insight for {self.data['apps'][pid]['app_name']}")
+      return
+    self.is_ai_processing_locked = True
+
+    # Data that is not included in AI prompt
+    ignore_keys = ['total_clicks', 'last_active_time', 'insight']
+    
+    # Check if app insight cooldown has passed
+    print(f"Getting insight for {self.data['apps'][pid]['app_name']}")
 
     # Building the data to be sent to the AI
     app_data = self.data['apps'][pid]
     app_data = {k: v for k, v in app_data.items() if k not in ignore_keys}
 
-    print("---------------- APP input data --------------------")
-    print(json.dumps(app_data, indent=2))
-    print("------------------------------------")
-
     # Function to set the insight that is returned from the AI
     def set_insight(insight):
-      self.is_ai_processing_lock.release()
+      self.is_ai_processing_locked = False
       if insight is None:
         print(f"Insight for {self.data['apps'][pid]['app_name']} is None")
         return
       if 'insight' in self.data['apps'][pid]:
-        self.data['apps'][pid]['insight']['history'].append(self.data['apps'][pid]['insight'])
+        self.data['apps'][pid]['insight']['history'].append({
+          'value': self.data['apps'][pid]['insight']['value'],
+          'timestamp': self.data['apps'][pid]['insight']['timestamp']
+        })
         self.data['apps'][pid]['insight']['value'] = insight
         self.data['apps'][pid]['insight']['timestamp'] = time.time()
-
-      print("---------------- APP Insight --------------------")
-      print(json.dumps(self.data['apps'][pid], indent=2))
-      print("------------------------------------")
 
       self.new_app_insight_event.invoke(pid)
 
@@ -193,78 +190,75 @@ class Brain(Component):
     threading.Thread(target=analyze_data, args=("app_insight", app_data, set_insight)).start()
 
   def _get_activity_insight(self, pid):
-    if self.is_ai_processing_lock.locked():
-      print(f"AI is already processing data, skipping activity insight for {self.data['apps'][pid]['app_name']}")
-      return
-    
-    self.is_ai_processing_lock.acquire()
-
     if pid not in self.data['apps']:
+      print(f"App {pid} not found in data, skipping activity insight")
       return None
     
     # Gather data of apps that were used in the same time period as this app
-    app_data = self.data['apps'][pid]
-    related_apps = [ pid for pid, app in self.data['apps'].items() if pid != app_data['app_name'] and \
-      app_data['app_name'] in app['related_app_pids'] and \
-      app['related_app_pids'][app_data['app_name']] >= self.related_app_frequency_threshold ]
+    related_apps_pids = [ check_pid for check_pid, check_app in self.data['apps'].items() \
+      if pid != check_pid and pid in check_app['related_app_pids'] and \
+      check_app['related_app_pids'][pid] >= self.related_app_frequency_threshold ]
 
-    if len(related_apps) == 0:
+    if len(related_apps_pids) == 0:
       print(f"No related apps found for {self.data['apps'][pid]['app_name']}")
       return
-
-    filtered_apps = {k: v for k, v in self.data['apps'].items() if k in [pid, *related_apps]}
-
-    # Build the data to be sent to the AI
-    include_keys = ['app_name', 'active_time_seconds', 'insight']
-    activity_data = [
-      {k: v for k, v in app_data.items() if k in include_keys}
-      for app_data in filtered_apps.values()
-    ]
-
+    
     # Check if activity insight cooldown has passed
-    related_app_names = set([self.data['apps'][related_app]['app_name'] for related_app in related_apps])
+    activity_app_pids = [pid, *related_apps_pids]
+    activity_app_names = set([self.data['apps'][activity_app_pid]['app_name'] for activity_app_pid in activity_app_pids])
     for activity in self.data['activities']:
-        if related_app_names.issubset(activity['app_names']) or activity['app_names'].issubset(related_app_names):
+        if activity_app_names.issubset(activity['app_names']) or activity['app_names'].issubset(activity_app_names):
           if activity['insight']['value'] and \
               time.time() - activity['insight']['timestamp'] < self.activity_insight_cooldown:
             print(f"Activity insight for {activity['app_names']} is still valid")
             return
+          break
+    
+    if self.is_ai_processing_locked:
+      print(f"AI is already processing data, skipping activity insight for {self.data['apps'][pid]['app_name']}")
+      return
+    self.is_ai_processing_locked = True
 
-
-    print("---------------- activity input data --------------------")
-    print(json.dumps(activity_data, indent=2))
-    print("------------------------------------")
+    # Build the data to be sent to the AI
+    activity_apps = {k: v for k, v in self.data['apps'].items() if k in activity_app_pids}
+    include_keys = ['app_name', 'active_time_seconds', 'insight']
+    activity_data = [
+      {k: v for k, v in app_data.items() if k in include_keys}
+      for app_data in activity_apps.values()
+    ]
 
     # Function to set the insight that is returned from the AI
     def set_insight(insight):
-      self.is_ai_processing_lock.release()
+      self.is_ai_processing_locked = False
       if insight is None:
         print(f"Insight for {self.data['apps'][pid]['app_name']} is None")
         return
 
       found = False
       for activity in self.data['activities']:
-        if related_app_names.issubset(activity['app_names']) or activity['app_names'].issubset(related_app_names):
-          activity['insight']['history'].append({'app_names': activity['app_names'], 'insight': activity['insight']})
+        if activity_app_names.issubset(activity['app_names']) or activity['app_names'].issubset(activity_app_names):
+          activity['insight']['history'].append({
+            'app_names': activity['app_names'],
+            'insight': {
+              'value': activity['insight']['value'],
+              'timestamp': activity['insight']['timestamp']
+            }
+          })
           activity['insight']['value'] = insight
           activity['insight']['timestamp'] = time.time()
-          activity['app_names'] = related_app_names
+          activity['app_names'] = activity_app_names
           found = True
           break
 
       if not found:
         self.data['activities'].append({
-          'app_names': related_app_names,
+          'app_names': activity_app_names,
           'insight': {
             'value': insight,
             'timestamp': time.time(),
             'history': []
           }
         })
-
-      print("---------------- activity Insight --------------------")
-      print(json.dumps(self.data['activity']['insight'], indent=2))
-      print("------------------------------------")
 
       self.new_activity_insight_event.invoke()
 

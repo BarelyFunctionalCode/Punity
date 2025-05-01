@@ -10,7 +10,7 @@ if __name__ == "__main__":
   scene = Scene(True)
 
   # Create the fren object
-  Fren(scene, 'hole_punch')
+  Fren(scene)
 
   # StickyAppModal(
   #   scene,

@@ -15,8 +15,6 @@ class Object(Component):
     self._is_first_frame = True
     self.parent = parent
     self.children = np.array([])
-    if parent != None:
-      parent.children = np.append(parent.children, self)
     self.name = f"{name.lower()}_{id(self)}"
     self.tk_obj = None
 
@@ -54,6 +52,10 @@ class Object(Component):
 
     # Adding object to Environment
     Environment.objects = np.append(Environment.objects, self)
+
+    # Adding the object to the parent's children
+    if parent != None:
+      parent.children = np.append(parent.children, self)
 
     # Run start function, and start the update loop
     self.start()

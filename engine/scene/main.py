@@ -5,17 +5,16 @@ from engine import Environment, Object
 from .border import Border
 from .editor import Editor
 
-
 class Scene(Object):
   def __init__(self, dev_mode=False):
     super().__init__()
+    if platform.system() == 'Darwin':
+      import AppKit
+      # Set application activation policy to not allow menubar, dock, or application focus
+      AppKit.NSApp.setActivationPolicy_(AppKit.NSApplicationActivationPolicyAccessory)
+
     self.editor = None
     Environment.set_root(self)
-
-    if platform.system() == 'Darwin':
-      # Set application activation policy to not allow menubar, dock, or application focus
-      import AppKit
-      AppKit.NSApp.setActivationPolicy_(AppKit.NSApplicationActivationPolicyProhibited)
       
     Environment.start_input_event_monitor()
 
