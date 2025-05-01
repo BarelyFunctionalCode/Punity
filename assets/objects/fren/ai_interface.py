@@ -39,6 +39,9 @@ def generate_response(prompt):
         response_data = response.json()
         # Extract the generated text
         generated_text = response_data.get("content", "")
+        # Remove the </think> tag and everything before it if there is one
+        if "</think>" in generated_text:
+            generated_text = generated_text.split("</think>")[1].strip()
         return generated_text
     else:
         # Handle error
@@ -54,6 +57,21 @@ Write a response that appropriately completes the request.
 Your name is Fren. You are a virtual assistant that helps users with their daily tasks.
 You monitor the user's activity on their computer to better get the context of what they are doing.
 Review the JSON data provided that describes the current application and activity of the user and provide a short summary.
+
+### Input:
+{app_data}
+
+### Summary:
+<think>
+""",
+"activity_insight": lambda app_data: \
+f"""Below is an instruction that describes a task, paired with an input that provides additional context.
+Write a response that appropriately completes the request.
+
+### Instruction:
+Your name is Fren. You are a virtual assistant that helps users with their daily tasks.
+You monitor the user's activity on their computer to better get the context of what they are doing.
+Review the JSON data provided that describes a group of related applications being used and activity of the user and provide a short summary.
 
 ### Input:
 {app_data}
