@@ -27,20 +27,35 @@ class Environment:
     self.new_application_event = Event()
     self.new_application_event.add_listener(self._track_new_application)
 
+    self.inactivity_timeout = 10000
+    self.inactivity_timer = 0
+    self.inactivity_event = Event()
+
     self.mouse_position = Vector2([0, 0])
     self.new_input_event = Event()
     self.new_input_event.add_listener(self._parse_keyboard_text)
 
-    self.keyboard_new_log_timeout = 20
-    self.keyboard_last_event_time = 0
     self.keyboard_current_log = ''
     self.keyboard_current_log_window = -1
     self.keyboard_log_history = []
+
 
   def update(self):
     update_applications(self.applications, self.new_application_event)
 
     # TODO: If current keyboard log has sat for log enough, send event for current log and start new one
+    if self.inactivity_timer > self.inactivity_timeout:
+      if self.keyboard_current_log != '':
+        self._new_keyboard_log(time.time())
+
+      self.inactivity_event.invoke({
+        'timestamp': time.time(),
+        'type': 'inactivity',
+        'pid': self.active_application_pid,
+      })
+      self.inactivity_timer = -1
+    elif self.inactivity_timer != -1:
+      self.inactivity_timer += 100
     self.root.tk_obj.after(100, self.update)
 
   def set_root(self, root):
@@ -67,26 +82,17 @@ class Environment:
 
 
   def _track_new_application(self, app_pid):
+    self.inactivity_timer = 0
     self.active_application_pid = app_pid
 
   def _parse_keyboard_text(self, event_data):
+    self.inactivity_timer = 0
     if event_data['type'] == 'key_down':
-      self.keyboard_last_event_time = event_data['timestamp']
-
       # If enough time has passed since the last key event, treat it as a new log
       # If the active application has changed since the last keyboard input, treat it as a new log
       # Enter key triggers an event
-      if len(self.keyboard_current_log) != 0 and (time.time() - self.keyboard_last_event_time > self.keyboard_new_log_timeout or \
-          self.keyboard_current_log_window != self.active_application_pid or \
-          event_data['key'] == '\r') :
-        self.keyboard_log_history.append(self.keyboard_current_log)
-        self.keyboard_current_log = ''
-        self.new_input_event.invoke({
-          'timestamp': event_data['timestamp'],
-          'type': 'keyboard_log',
-          'text': self.keyboard_log_history[-1],
-          'pid': self.keyboard_current_log_window,
-        })
+      if len(self.keyboard_current_log) != 0 and (self.keyboard_current_log_window != self.active_application_pid or event_data['key'] == '\r') :
+        self._new_keyboard_log(event_data['timestamp'])
       if event_data['key'] == '\r': return
       # Handle other keys
       if event_data['key'] == '\x7f': # Backspace
@@ -99,4 +105,13 @@ class Environment:
       
       self.keyboard_current_log_window = self.active_application_pid
 
+  def _new_keyboard_log(self, timestamp):
+    self.keyboard_log_history.append(self.keyboard_current_log)
+    self.keyboard_current_log = ''
+    self.new_input_event.invoke({
+      'timestamp': timestamp,
+      'type': 'keyboard_log',
+      'text': self.keyboard_log_history[-1],
+      'pid': self.keyboard_current_log_window,
+    })
 Instance = Environment()

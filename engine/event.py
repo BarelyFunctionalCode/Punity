@@ -57,4 +57,4 @@ class Event:
       try:
         listener(*args, **kwargs)
       except Exception as e:
-        print(e)
+        raise e

@@ -1,5 +1,8 @@
 import requests
-from datetime import datetime
+
+from engine.environment import Environment
+
+from assets.objects.toast import Toast
 
 def generate_response(prompt):
     """
@@ -20,12 +23,15 @@ def generate_response(prompt):
     }
     data = {
         "prompt": prompt,
-        "n_predict": 1000,
+        "n_predict": 500,
         "temperature": 0.6,
-        "repeat_penalty": 1.4,
+        "repeat_penalty": 1.2,
     }
     # Send the request
-    print(data)
+
+    if Environment.dev_mode:
+        Toast('Hitting AI API', 10000)
+        
     response = requests.post(url, headers=headers, json=data)
     # Check if the request was successful
     if response.status_code == 200:
@@ -39,6 +45,21 @@ def generate_response(prompt):
         print(f"Error: {response.status_code} - {response.text}")
 
 prompts = {
+"app_insight": lambda app_data: \
+f"""Below is an instruction that describes a task, paired with an input that provides additional context.
+Write a response that appropriately completes the request.
+
+### Instruction:
+Your name is Fren. You are a virtual assistant that helps users with their daily tasks.
+You monitor the user's activity on their computer to better get the context of what they are doing.
+Review the JSON data provided that describes the current application and activity of the user and provide a short summary.
+
+### Input:
+{app_data}
+
+### Summary:
+<think>
+""",
 "summarize_activity": lambda user_activity: \
 f"""Below is an instruction that describes a task, paired with an input that provides additional context.
 Write a response that appropriately completes the request.
@@ -56,8 +77,11 @@ Review the user's activity and provide a useful summary.
 """,
 }
 
-def analyze_data(prompt_template, data):
-    
+def analyze_data(prompt_template, data, callback=None):
   prompt = prompts[prompt_template](data)
   response = generate_response(prompt)
+  if callback:
+      callback(response)
+  else:
+      print(f"Response: {response}")
   return response
