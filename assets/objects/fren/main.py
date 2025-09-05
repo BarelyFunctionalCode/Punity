@@ -16,7 +16,8 @@ from . import actions
 class Fren(Object, Rigidbody, Brain, Face, Movement):
   def __init__(self, parent, entrance=None):
     # Setting up the entrance that's defined
-    self.face_polygon = [20,0, 120,0, 140,20, 145,90, 120,140, 90,160, 50,160, 20,140, -5,90, 0,20, 20,0,]
+    # self.face_polygon = [10,0, 60,0, 70,10, 73,45, 60,70, 45,80, 25,80, 10,70, -3,45, 0,10, 10,0,]
+    self.face_polygon = [10,0, 90,0, 95,20, 100,55, 85,90, 65,110, 35,110, 15,90, 0,55, 5,20, 10,0,]
     x = 200
     y = 200
     self.entrance = None
@@ -37,8 +38,9 @@ class Fren(Object, Rigidbody, Brain, Face, Movement):
 
     kwargs = {
       'use_gravity': False,
+      'use_brain': False
     }
-    super().__init__(parent, 'fren', 140, 170, x, y, False, **kwargs)
+    super().__init__(parent, 'fren', 100, 110, x, y, False, **kwargs)
     
   def start(self):
     super().start()
@@ -56,7 +58,6 @@ class Fren(Object, Rigidbody, Brain, Face, Movement):
       self.inactivity_timer = 0
       return
     
-
     if self.inactivity_timer < self.inactivity_timeout:
       self.inactivity_timer += self.delta_time
     else:

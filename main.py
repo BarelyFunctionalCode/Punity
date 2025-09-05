@@ -5,10 +5,10 @@ from assets.objects.fren import Fren
 if __name__ == "__main__":
 
   # Root object for all other objects to spawn from
-  scene = Scene(True)
+  scene = Scene(False)
 
   # Create the fren object
-  Fren(scene)
+  Fren(scene, 'hole_punch')
 
   # Run the main loop
   scene.begin()

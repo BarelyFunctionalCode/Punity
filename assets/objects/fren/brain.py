@@ -29,6 +29,7 @@ class Brain(Component):
   summary of the user's activity.
   """
   def __init__(self, **kwargs):
+    self.is_enabled = kwargs.get('use_brain', True)
     self.data = {
       'apps': {},
       'activities': []
@@ -61,6 +62,8 @@ class Brain(Component):
 
   def start(self):
     super().start()
+    if not self.is_enabled:
+      return
     Environment.new_input_event.add_listener(self._ingest_input_event)
     Environment.inactivity_event.add_listener(self._inactivity_event)
 

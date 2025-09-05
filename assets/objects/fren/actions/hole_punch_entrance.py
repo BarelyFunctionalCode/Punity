@@ -13,7 +13,7 @@ class HolePunchEntrance(Object):
     self.fren = fren
     self.polygon = list(fren.face_polygon)
     if self.polygon == None:
-      self.polygon = [0,0, 200,0, 200,200, 0,200]
+      self.polygon = [-10,-10, 200,-10, 200,200, -10,200]
     # Offset from the hole punch and the extra screen chunk
     min_x = min(self.polygon[::2])
     max_x = max(self.polygon[::2])

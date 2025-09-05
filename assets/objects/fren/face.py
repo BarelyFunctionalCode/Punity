@@ -36,6 +36,7 @@ class Face(Component):
   def start(self):
     super().start()
     # Face Parameters
+    self.face_size_factor = self.transform.width / 70.0
     self.center = np.array([self.transform.width / 2, self.transform.height / 2.3, 0])
     self.face_parameters = {
       "look_target": {
@@ -76,8 +77,8 @@ class Face(Component):
         "speed_factor": 1.0,
       },
       "face_position": {
-        "current_value": np.array([self.transform.width / 2, 75.0, 0]),
-        "target_value": np.array([self.transform.width / 2, 75.0, 0]),
+        "current_value": np.array([self.transform.width / 2, 37.5 * self.face_size_factor, 0]),
+        "target_value": np.array([self.transform.width / 2, 37.5 * self.face_size_factor, 0]),
         "max_speed": 20,
         "min_speed": 1,
         "speed_factor": 1.0,
@@ -151,13 +152,13 @@ class Face(Component):
     eye_open_value *= self.face_parameters["eye_open_factor"]["current_value"]
 
     # Eye size based on base parameters and eye open value
-    eye_scale = 12.0 * self.face_parameters["face_scale"]["current_value"]
+    eye_scale = 6.0 * self.face_size_factor * self.face_parameters["face_scale"]["current_value"]
     eye_x = 2.75
     eye_size = np.array([eye_scale * eye_x, eye_scale * eye_open_value])
     eye_half_size = eye_size / 2
 
     # Keep the pupil within the eye
-    pupil_radius = 10.0 * self.face_parameters["face_scale"]["current_value"]
+    pupil_radius = 5.0 * self.face_size_factor * self.face_parameters["face_scale"]["current_value"]
     pupil_max_movement = np.array(eye_half_size - [pupil_radius, pupil_radius]).clip(0)
 
     # Calculate pupil position based on look direction
@@ -167,8 +168,8 @@ class Face(Component):
     pupil_center = np.clip(pupil_center, -pupil_max_movement, pupil_max_movement)
 
     # Eye position and generating oval coordinates for canvas
-    eye_distance = 35.0 * self.face_parameters["face_scale"]["current_value"]
-    eye_offset_pos = np.array([0,-30]) * self.face_parameters["face_scale"]["current_value"]
+    eye_distance = 17.5 * self.face_size_factor * self.face_parameters["face_scale"]["current_value"]
+    eye_offset_pos = np.array([0,-12]) * self.face_size_factor * self.face_parameters["face_scale"]["current_value"]
     eye_positions = [
       self.center[:2] - np.array([eye_distance, 0]) + eye_offset_pos + (look_direction[:2] * 15.0),
       self.center[:2] + np.array([eye_distance, 0]) + eye_offset_pos + (look_direction[:2] * 15.0)
@@ -206,13 +207,13 @@ class Face(Component):
         mouth_resolution
       )
     )
-    mouth_amplitude = 25.0 * self.face_parameters["face_scale"]["current_value"] * self.face_parameters["mouth_open_factor"]["current_value"]
+    mouth_amplitude = 12.5 * self.face_size_factor * self.face_parameters["face_scale"]["current_value"] * self.face_parameters["mouth_open_factor"]["current_value"]
     mouth_sine = mouth_sine * mouth_amplitude
 
     # Calculate mouth position based on face position and mouth offset
-    mouth_offset_pos = np.array([0, 45.0]) * self.face_parameters["face_scale"]["current_value"]
+    mouth_offset_pos = np.array([0, 27.5]) * self.face_size_factor * self.face_parameters["face_scale"]["current_value"]
     mouth_center = np.array([0, 0])
-    mouth_length = (50.0 + 50.0 * (1.0 - self.face_parameters["mouth_open_factor"]["current_value"])) * self.face_parameters["face_scale"]["current_value"]
+    mouth_length = (20.0 + 20.0 * (1.0 - self.face_parameters["mouth_open_factor"]["current_value"])) * self.face_size_factor * self.face_parameters["face_scale"]["current_value"]
     mouth_start = self.center[:2] + mouth_offset_pos + mouth_center - np.array([mouth_length / 2, 0])
 
     def slope_mouth(x, value):
