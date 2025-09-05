@@ -1,6 +1,7 @@
 from enum import Enum
 
 from .vector2 import *
+from .vector3 import *
 
 ###################################
 ########## Util Functions #########
@@ -18,3 +19,5 @@ class Side(Enum):
   RIGHT = 1
   BOTTOM = 2
   LEFT = 3
+  FRONT = 4
+  BACK = 5

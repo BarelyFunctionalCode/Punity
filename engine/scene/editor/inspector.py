@@ -1,4 +1,5 @@
 import tkinter as tk
+import numpy as np
 import types
 
 from engine import Environment
@@ -30,8 +31,8 @@ class Inspector:
       return value
     elif isinstance(value, bool):
       return 'True' if value else 'False'
-    elif isinstance(value, (list, tuple)):
-      return ', '.join([str(v) for v in value])
+    elif isinstance(value, (list, tuple, np.ndarray)):
+      return '\n' + ',\n'.join([str(v) for v in value])
     elif isinstance(value, (int, float)):
       return f"{value:.2f}"
     else:
@@ -44,12 +45,12 @@ class Inspector:
     self.obj_info[pane + '_' +name] = tk.Label(
       self.obj_info[pane + '_pane'],
       text=f"{name_truncated}{spacing}{self.format_value(value)}" if not is_title else pane[0].upper() + pane[1:],
-      width=40,
+      width=50,
       pady=1,
       anchor='w',
       background='#777' if is_title else self.obj_info[pane + '_pane']['background'],
       foreground='black' if is_title else 'white',
-      font=('Courier New', 15 if is_title else 12, 'bold' if is_title else 'normal'),
+      font=('Courier New', 15 if is_title else 9, 'bold' if is_title else 'normal'),
       # wraplength=300,
       # justify=tk.LEFT
     )
