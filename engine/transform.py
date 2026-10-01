@@ -24,11 +24,11 @@ class Transform:
 
   def __init__(self, object):
     self.object: "Object" = object
-    self._position = Vector2([self.object.tk_obj.winfo_x(), self.object.tk_obj.winfo_y()])
+    self._position = Vector2([self.object._x, self.object._y])
     self._last_position = Vector2(self._position)
     self.did_move_this_frame = False
-    self._width = self.object.tk_obj.winfo_width()
-    self._height = self.object.tk_obj.winfo_height()
+    self._width = self.object._width
+    self._height = self.object._height
 
   @property
   def position(self) -> Vector2:

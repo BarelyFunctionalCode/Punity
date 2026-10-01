@@ -1,4 +1,3 @@
-import tkinter as tk
 import threading
 import json
 import time

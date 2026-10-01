@@ -60,6 +60,22 @@ class Object(Component):
     # Run start function, and start the update loop
     self.start()
 
+  @property
+  def _x(self):
+    return self.tk_obj.winfo_x()
+
+  @property
+  def _y(self):
+    return self.tk_obj.winfo_y()
+
+  @property
+  def _width(self):
+    return self.tk_obj.winfo_width()
+
+  @property
+  def _height(self):
+    return self.tk_obj.winfo_height()
+
   # Time between the last update and the current update
   @property
   def delta_time(self):

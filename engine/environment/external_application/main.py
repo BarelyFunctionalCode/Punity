@@ -5,8 +5,10 @@ from engine.math import Vector2
 
 if platform.system() == 'Windows':
   from .windows import get_applications
-else:
+elif platform.system() == 'Darwin':
   from .macos import get_applications
+elif platform.system() == 'Linux':
+  from .linux import get_applications
 
 
 class ExternalApplication:

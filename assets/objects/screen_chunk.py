@@ -1,6 +1,6 @@
 from PIL import Image, ImageDraw
 import tkinter as tk
-import pyautogui
+import pyscreenshot
 import shapely
 
 from engine import Object
@@ -52,7 +52,7 @@ class ScreenChunk(Object):
       self.polygon = list(diff.exterior.coords)
 
     # Take screenshot of the screen chunk
-    screenshot = pyautogui.screenshot(region=(x, y, width, height))
+    screenshot = pyscreenshot.grab(bbox=(x, y, x + width, y + height))
 
     # Mask screenshot to polygon
     screenshot = screenshot.crop((0, 0, width, height))

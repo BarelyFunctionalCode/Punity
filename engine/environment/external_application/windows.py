@@ -1,1 +1,3 @@
-# TODO: implement the Windows version of the external application class
+def get_applications():
+  applications = []
+  return applications

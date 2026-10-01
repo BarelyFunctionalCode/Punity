@@ -1,9 +1,11 @@
 numpy
-pillow
+pillow>=9.2.0
 pyautogui
 python-xlib
 requests
 shapely
+pyscreenshot
 pywinctl
 py2app
 opencv-python
+pyside6

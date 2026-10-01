@@ -13,9 +13,11 @@ class TkRoot(tk.Tk):
       self.wm_attributes("-disabled", True)
       self.wm_attributes("-transparentcolor", "white")
       self.config(bg='white')
-    else:
+    elif platform.system() == "Darwin":
       self.wm_attributes("-transparent", True)
       self.config(bg='systemTransparent')
+    elif platform.system() == "Linux":
+      self.config(bg='black')
 
     self.config(cursor='arrow')
     self.geometry("0x0+0+0")
@@ -36,9 +38,11 @@ class TkWindow(tk.Toplevel):
       self.wm_attributes("-disabled", True)
       self.wm_attributes("-transparentcolor", "white")
       self.config(bg='white')
-    else:
+    elif platform.system() == "Darwin":
       self.wm_attributes("-transparent", True)
       self.config(bg='systemTransparent')
+    elif platform.system() == "Linux":
+      self.config(bg='black')
 
     self.config(cursor='arrow')
     self.geometry("0x0+0+0")
