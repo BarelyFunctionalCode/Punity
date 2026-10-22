@@ -1,0 +1,100 @@
+from queue import Queue
+
+from Punity.engine import Object, Environment
+from Punity.engine.math import Vector2
+
+from Punity.assets.components.rigidbody import Rigidbody
+from Punity.assets.objects.terminal import Terminal
+
+from .movement import Movement
+from .brain import Brain
+from .face import Face
+from . import actions
+
+
+class Fren(Object, Rigidbody, Brain, Face, Movement):
+  def __init__(self, parent, entrance=None):
+    # Setting up the entrance that's defined
+    # self.face_polygon = [10,0, 60,0, 70,10, 73,45, 60,70, 45,80, 25,80, 10,70, -3,45, 0,10, 10,0,]
+    self.face_polygon = [10,0, 90,0, 95,20, 100,55, 85,90, 65,110, 35,110, 15,90, 0,55, 5,20, 10,0,]
+    x = 200
+    y = 200
+    self.entrance = None
+    if entrance in actions.entrances:
+      self.entrance = actions.entrances[entrance]
+      x = self.entrance.spawn_position.x
+      y = self.entrance.spawn_position.y
+
+    self.is_busy = False
+    self.inactivity_timer = 0
+    self.inactivity_timeout = 10000
+    self.asleep_timer = 0
+    self.asleep_fade_timeout = 20000
+    self.terminal_despawn_timer = 0
+    self.terminal_despawn_timeout = 5000
+    self.terminal = None
+    self.terminal_update_queue = Queue()
+
+    kwargs = {
+      'use_gravity': False,
+      'use_brain': False
+    }
+    super().__init__(parent, 'fren', 100, 110, x, y, False, **kwargs)
+    
+  def start(self):
+    super().start()
+    # Run the entrance
+    if self.entrance:
+      self.entrance = self.entrance(self.parent, self)
+
+    # Environment event listeners
+    Environment.new_application_event.add_listener(self.new_application_trigger)
+
+  def update(self):
+    super().update()
+    self.is_busy = (self.terminal and self.terminal.is_active) or self.is_face_active
+    if self.is_busy:
+      self.inactivity_timer = 0
+      return
+    
+    if self.inactivity_timer < self.inactivity_timeout:
+      self.inactivity_timer += self.delta_time
+    else:
+      self.set_face_expression("sleep")
+
+      # Once asleep for long enough, fade out
+      if self.asleep_timer < self.asleep_fade_timeout:
+        self.asleep_timer += self.delta_time
+      else:
+        self.fade_out()
+
+
+    # TODO: Terminal should destroy itself when it's done
+    if self.terminal and self.terminal.is_destroyed:
+      self.terminal = None
+
+    if not self.terminal and not self.terminal_update_queue.empty():
+      terminal_position = self.transform.position.astype(int) - Vector2([0, 100])
+      self.terminal = Terminal(Environment.root, terminal_position.x, terminal_position.y, 5000, self.terminal_update_queue, self.talking_queue)
+
+    if self.is_face_asleep and self.move_mode != 'sleep':
+      self.set_move_mode('sleep')
+    elif not self.is_face_asleep and self.move_mode == 'sleep':
+      self.set_move_mode('idle')
+
+  def wake_up(self):
+    if not self.is_face_asleep or self.is_busy:
+      return
+    self.asleep_timer = 0
+    self.fade_in()
+    self.set_face_expression("wake")
+
+  # Used by the assistant to update the terminal text
+  def enqueue_update_text(self, text):
+    self.wake_up()
+    self.terminal_update_queue.put(text)
+
+  # Behavior triggers
+  def new_application_trigger(self, app_pid):
+    # self.enqueue_update_text(f"New application detected: {app_pid}\n")
+    pass

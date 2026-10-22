@@ -4,7 +4,7 @@ Unity, but in Python?
 
 This project is geared towards creating UI experiences not bound to an application window, or at least make it look that way.
 
-Using Tkinter (tcl-tk) as the base for making graphics, and a similar structure and workflow as Unity, you can create anything from a persistant customized menu, an overlay for another program, or even a full-blown video game.
+Using Qt 6 as the base for making graphics, and a similar structure and workflow as Unity, you can create anything from a persistant customized menu, an overlay for another program, or even a full-blown video game.
 
 ## Project Structure
 
@@ -22,11 +22,11 @@ Using Tkinter (tcl-tk) as the base for making graphics, and a similar structure 
 
   - **Component.py** - Used for the base of object.py and anything in the `assets/components` folder, which allows for user-created objects to use multiple inheritence to select whichever components apply for their object. This class is responsible for storing any shared functions that span all objects and components.
 
-  - **object.py** - The base class used for all user-created objects. This class facilitates the creation of the underlying Tk objects as well as runs the Update loop and collision detection for all objects.
+  - **object.py** - The base class used for all user-created objects. This class facilitates the creation of the underlying Qt objects as well as runs the Update loop and collision detection for all objects.
 
   - **transform.py** - Used by the `Object` class to manage positional and size data for all objects.
 
-  - **scene** - Class used to create the root Tk Window and the collision objects for the screen border. Also houses the `Editor` class.
+  - **scene** - Class used to create the root Qt Window and the collision objects for the screen border. Also houses the `Editor` class.
 
     - **border.py** - A meta object of sorts thats used to add collision detection to the edges of the screen.
 
@@ -98,7 +98,7 @@ class NewObject(Object):
 
 The following instance variables are defined in the base class `Object`, which can be referenced by any class that inherits from it.
 
-- `self.tk_obj` - The underlying Tk Window used for visualizing anything in the object. This is generally not used as most functionality dealing with Tk is abstracted away into class and helper functions.
+- `self.qt_obj` - The underlying TQt Window used for visualizing anything in the object. This is generally not used as most functionality dealing with Qt is abstracted away into class and helper functions.
 - `self.name` - The name of the object based on the string passed in to the `super().__init__` call.
 - `self.parent` - The `Object` that this class instance was spawned in to.
 - `self.children` - A list of `Object`'s that contains anything created within the logic of this class.
