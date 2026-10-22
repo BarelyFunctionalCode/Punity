@@ -4,10 +4,10 @@ from engine import Environment
 from engine import Object
 
 class ToastContainer(Object):
-  def __init__(self, parent, x, y):
+  def __init__(self):
     self.move_speed = 2
 
-    super().__init__(parent, "toast_container", 0, 0, x, y, True)
+    super().__init__(Environment.root, "toast_container", Environment.width, Environment.height, 20, 30, True)
     self.collision_enabled = False
 
   def update(self):
@@ -15,15 +15,15 @@ class ToastContainer(Object):
 
     flipped_children = np.array(self.children)[::-1]
     if len(flipped_children) > 0:
-      desired_y = Environment.y + 5
+      desired_y = self.transform.position.y
       for child in flipped_children:
 
         # Move Toast to the right till it is fully on screen
         current_position = child.transform.position
-        if current_position.x < 0:
+        if current_position.x < self.transform.position.x:
           child.transform.position = [current_position.x + self.move_speed * self.delta_time, current_position.y]
-        elif current_position.x > 0:
-          child.transform.position = [0, current_position.y]
+        elif current_position.x > self.transform.position.x:
+          child.transform.position = [self.transform.position.x, current_position.y]
 
         # Move Toast up/down to form a stack
         current_position = child.transform.position

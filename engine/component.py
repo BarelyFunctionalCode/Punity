@@ -8,5 +8,8 @@ class Component:
   def update(self):
     Exception("Not Implemented")
 
+  def post_update(self, did_geomentry_update):
+    Exception("Not Implemented")
+
   def on_collision(self, col_normal, col_vec, other_object):
     Exception("Not Implemented")

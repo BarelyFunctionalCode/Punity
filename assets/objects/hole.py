@@ -22,7 +22,7 @@ class Hole(Object):
     super().start()
 
     # Create hole polygon
-    Polygon(self, self.hole_polygon, fill='black', outline=self.tk_obj['bg'])
+    Polygon(self, self.hole_polygon, fill='black')
 
   def update(self):
     super().update()

@@ -9,3 +9,4 @@ pywinctl
 py2app
 opencv-python
 pyside6
+pynput

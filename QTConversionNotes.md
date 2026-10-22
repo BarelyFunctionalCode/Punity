@@ -71,24 +71,26 @@ https://doc.qt.io/qtforpython-6/PySide6/QtGui/QStyleHints.html#PySide6.QtGui.QSt
 
 # Files to Update
 
-- engine/object.py
-- engine/scene/main.py
-- engine/scene/editor/inspector.py
-- engine/scene/editor/hierarchy.py
-- engine/scene/editor/control_menu.py
-- engine/graphics/main.py
-- engine/graphics/text.py
-- engine/graphics/sprite.py
-- engine/graphics/shape.py
-- engine/graphics/threedee/main.py
-- assets/effects/hole_punch.py (Abstract TK usage to object)
-- assets/objects/terminal.py (Abstract TK usage to object)
-- assets/objects/screen_chunk.py
-- assets/objects/modal.py (Abstract TK usage to object)
-- assets/objects/hole.py (Abstract TK usage to object)
-- assets/objects/fren/actions/hole_punch_entrance.py (Abstract TK usage to object)
+- [x] engine/object.py
+- [x] engine/scene/main.py 
+- [] engine/scene/editor/inspector.py
+- [] engine/scene/editor/hierarchy.py
+- [] engine/scene/editor/control_menu.py
+- [x] engine/graphics/main.py
+- [x] engine/graphics/text.py
+- [] engine/graphics/sprite.py
+- [] engine/graphics/shape.py
+- [] engine/graphics/threedee/main.py
+- [x] assets/effects/hole_punch.py (Abstract TK usage to object)
+- [] assets/objects/terminal.py (Abstract TK usage to object)
+- [x] assets/objects/screen_chunk.py
+- [x] assets/objects/modal.py (Abstract TK usage to object)
+- [x] assets/objects/hole.py (Abstract TK usage to object)
+- [] assets/objects/fren/actions/hole_punch_entrance.py (Abstract TK usage to object)
+- [x] assets/objects/toast/main.py
 
 
 # Possible Changes
 
 - Remove AppKit window property usage
+- Replace usage of `setGeometry` and/or `setPosition` to `startSystemMove` and `startSystemResize`

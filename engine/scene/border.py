@@ -1,11 +1,12 @@
 from engine import Object
 from engine.math import Side
+from PySide6.QtGui import QColorConstants
 
 
 class BorderSide(Object):
   def __init__(self, parent, side: Side, width, height, x, y, thickness):
     if side == Side.TOP:
-      params = [width, thickness, x, y - thickness - 25] # Bit of a hacky way to get "above" the taskbar
+      params = [width, thickness, x, y - thickness - 25]
     elif side == Side.RIGHT:
       params = [thickness, height, x + width, y]
     elif side == Side.BOTTOM:
@@ -19,6 +20,10 @@ class BorderSide(Object):
   def start(self):
     super().start()
     self.collision_enabled = True
+
+  # def paint(self, p):
+  #   p.setFillStyle(QColorConstants.Red)
+  #   p.fillRect(self.transform.position.x - self.transform.width*5, self.transform.position.y - self.transform.height*5, self.transform.width*10, self.transform.height*10)
 
 
 # Created objects to represent the border of the screen, which allows for collision detection

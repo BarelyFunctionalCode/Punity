@@ -1,5 +1,6 @@
 from PIL import Image, ImageDraw
-import tkinter as tk
+# import tkinter as tk
+from engine import Environment
 import pyscreenshot
 import shapely
 
@@ -30,8 +31,8 @@ class ScreenChunk(Object):
     
   def start(self):
     super().start() if hasattr(super(), 'start') else None
-    x = int(self.transform.position.x)
-    y = int(self.transform.position.y)
+    x = int(self.transform.position.x) + Environment.x_offset
+    y = int(self.transform.position.y) + Environment.y_offset
     width = self.transform.width
     height = self.transform.height
 
@@ -61,8 +62,8 @@ class ScreenChunk(Object):
     screenshot.putalpha(mask)
     
     # Create sprite
-    Sprite(self, screenshot, 0, 0, anchor=tk.NW)
-
+    Sprite(self, screenshot, 0, 0)
+    self.update_visuals()
     self.lifetime_timer = 0
 
   def update(self):

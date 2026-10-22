@@ -1,42 +1,90 @@
-import tkinter as tk
+from PySide6.QtCanvasPainter import (QCanvasPainter)
+import numpy as np
+from PySide6.QtGui import QColor, QFont
 
-class Text:
-  def __init__(self, parent, text, x, y, **kwargs):
-    self.parent = parent
-    self.name = f"{__class__.__name__}_{id(self)}"
+from engine.graphics.main import Graphic
 
-    if not hasattr(self.parent, "canvas"):
-      self.parent.canvas = tk.Canvas(
-        self.parent.tk_obj,
-        width=self.parent.transform.width,
-        height=self.parent.transform.height,
-        bg=self.parent.tk_obj['bg'],
-        bd=0,
-        highlightthickness=0,
-        cursor='none'
-      )
-      self.parent.canvas.pack(padx=0, pady=0, side=tk.TOP)
 
-    self.tags = [self.name]
-    if "tags" in kwargs:
-      self.tags = [*self.tags, *list(kwargs["tags"])]
-      del kwargs["tags"]
+class Text(Graphic):
+  text_alignments = {
+    "left": QCanvasPainter.TextAlign.Left,
+    "center": QCanvasPainter.TextAlign.Center,
+    "right": QCanvasPainter.TextAlign.Right
+  }
+  text_baselines = {
+    "top": QCanvasPainter.TextBaseline.Top,
+    "middle": QCanvasPainter.TextBaseline.Middle,
+    "bottom": QCanvasPainter.TextBaseline.Bottom,
+    "hanging": QCanvasPainter.TextBaseline.Hanging
+  }
 
-    self.parent.canvas.create_text(
-      x, y,
-      text=text,
-      tags=self.tags,
-      **kwargs
-    )
+  def __init__(self, parent, text, **kwargs):
+    self._fill = None
+    self._opacity = 1.0
+    self._text = ""
 
-  def bind(self, event, callback):
-    self.parent.canvas.tag_bind(self.name, event, callback)
-    
-  def unbind(self, event):
-    self.parent.canvas.tag_unbind(self.name, event)
+    super().__init__(parent, "text")
 
-  def update(self, text):
-    self.parent.canvas.itemconfig(self.name, text=text)
+    self.text = text
+    self.x = kwargs.get("x", parent.transform.width / 2)
+    self.y = kwargs.get("y", parent.transform.height / 2)
+    self.font_size = kwargs.get("font_size", 20)
+    self.fill = kwargs.get("fill", "black")
+    self.opacity = kwargs.get("opacity", 1.0)
+    self.max_width = kwargs.get("max_width", parent.transform.width)
+    self.text_align = kwargs.get("text_align", QCanvasPainter.TextAlign.Center)
+    self.text_baseline = kwargs.get("text_baseline", QCanvasPainter.TextBaseline.Middle)
 
-  def destroy(self):
-    self.parent.canvas.delete(self.name)
+
+  @property
+  def fill(self):
+    return self._fill
+
+  @property
+  def opacity(self):
+    return self._opacity
+
+  @property
+  def text(self):
+    return self._text
+
+  @fill.setter
+  def fill(self, value):
+    old_fill = self._fill
+    self._fill = QColor(value)
+    self._fill.setAlphaF(self._opacity)
+    if old_fill != self._fill:
+      self.parent.update_visuals()
+
+  @opacity.setter
+  def opacity(self, value):
+    value = min(max(value, 0.0), 1.0)
+    if value == self._opacity:
+      return
+    self._opacity = value
+    self._fill.setAlphaF(self._opacity)
+    self.parent.update_visuals()
+
+  @text.setter
+  def text(self, value):
+    if value == self._text:
+      return
+    self._text = value
+    self.parent.update_visuals()
+
+  def paint(self, p):
+    if self.text is None:
+      return
+
+    font_size = round(self.font_size)
+    if font_size > 0:
+      p.setTextAlign(self.text_align)
+      p.setTextBaseline(self.text_baseline)
+      # font1.setWeight(QFont.Weight.Bold)
+      font1 = QFont("VCR OSD Mono")
+      font1.setPixelSize(font_size)
+      p.setFont(font1)
+      p.setFillStyle(self.fill)
+      p.setTextWrapMode(QCanvasPainter.WrapMode.Wrap)
+      position = self.parent.transform.position
+      p.fillText(self.text, position.x + self.x, position.y + self.y, self.max_width)

@@ -1,4 +1,5 @@
-import tkinter as tk
+from PySide6.QtCore import QRect
+from PySide6.QtCanvasPainter import QCanvasPainter
 
 from engine import Environment, Object
 from engine.math import Vector2
@@ -12,7 +13,7 @@ class Modal(Object):
     self.title = title
     self.text_content = text_content
     self.buttons = buttons
-    self.button_actions = button_actions
+    self.button_actions = {**button_actions, 'close': lambda _: self.destroy()}
     if len(buttons) == 0:
       self.buttons = [{'text': 'OK', 'action': 'close'}]
 
@@ -30,14 +31,15 @@ class Modal(Object):
     super().start()
 
     # Create the overlay
-    self.tk_obj.wm_attributes("-alpha", 0.5)
-    self.tk_obj.config(bg='black')
-
+    Rectangle(self, [0, 0, self.transform.width, self.transform.height], fill="#1A1A1A", opacity=0.5)
     
     # Create the modal window
     self.popup = ModalPopup(self, self.modal_width, self.modal_height, self.modal_x, self.modal_y, title=self.title, text_content=self.text_content, buttons=self.buttons, button_actions=self.button_actions)
-    self.popup.tk_obj.transient(self.tk_obj)  # Make the modal window transient to the main window
 
+  def destroy(self):
+    if self.popup:
+      self.popup.destroy()
+    super().destroy()
 
 class ModalPopup(Object):
   def __init__(self, parent, width, height, x, y, title='', text_content='', buttons=[], button_actions={}):
@@ -50,21 +52,14 @@ class ModalPopup(Object):
 
   def start(self):
     super().start()
-    self.tk_obj.config(bg='#333')
-    self.tk_obj.config(cursor='hand2')
+    Rectangle(self, [0, 0, self.transform.width, self.transform.height], fill='#333')
 
     # Create the title
     self.title_obj = {}
-    self.title_obj['rect'] = Rectangle(self, [0, 0, self.transform.width, 20], fill='#555', width=0)
-    self.title_obj['text'] = Text(self, self.title, 5, 5, anchor="nw", font=("Courier New", 12), fill="white")
+    self.title_obj['rect'] = Rectangle(self, [0, 0, self.transform.width, 20], fill='#555')
+    self.title_obj['text'] = Text(self, self.title, x=3, y=3, text_align=QCanvasPainter.TextAlign.Left, text_baseline=QCanvasPainter.TextBaseline.Hanging, font_size=14, fill="white")
     # Create the text content
-    self.text_obj = Text(
-      self,
-      self.text_content,
-      self.transform.width // 2,
-      self.transform.height // 2 - 50,
-      font=("Courier New", 15), fill="white"
-    )
+    self.text_obj = Text(self, self.text_content, fill="white")
     # Create the buttons
     self.button_objs = []
     for i, button in enumerate(self.buttons):
@@ -73,18 +68,37 @@ class ModalPopup(Object):
       y_pos = self.transform.height - self.button_size.y // 2 - 10
       button_obj['rect'] = Rectangle(
         self,
-        [x_pos - self.button_size.x // 2, y_pos - self.button_size.y // 2, x_pos + self.button_size.x // 2, y_pos + self.button_size.y // 2],
+        [x_pos - self.button_size.x // 2, y_pos - self.button_size.y // 2, self.button_size.x, self.button_size.y],
         fill='#555',
+        rounded_corners=5
       )
       button_obj['text'] = Text(
         self,
         button['text'],
-        x_pos,
-        y_pos,
-        width=self.button_size.x,
-        font=("Courier New", 15),
+        x=x_pos,
+        y=y_pos,
+        font_size=14,
         fill="white",
-        tags=[button_obj['rect'].name]
       )
-      button_obj['rect'].bind("<Button-1>", lambda event: self.button_actions[button['action']](event))
       self.button_objs.append(button_obj)
+    self.set_inputs(True)
+
+  def destroy(self):
+    self.set_inputs(False)
+    super().destroy()
+
+  def mouse_event(self, event):
+    window_position = self.transform.position
+    for i, button in enumerate(self.buttons):
+      x_pos = self.transform.width // 2 - ((len(self.buttons) - 1) * (self.button_size.x + 10)) // 2 + i * (self.button_size.x + 10)
+      y_pos = self.transform.height - self.button_size.y // 2 - 10
+
+      button_rect = QRect(
+        window_position.x + x_pos - self.button_size.x // 2,
+        window_position.y + y_pos - self.button_size.y // 2,
+        self.button_size.x,
+        self.button_size.y
+      )
+      if button_rect.contains(event.position().toPoint()):
+        if button['action'] in self.button_actions:
+          self.button_actions[button['action']](event)

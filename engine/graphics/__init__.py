@@ -1,4 +1,4 @@
-from .main import TkRoot, TkWindow
+from .main import QTWindow
 from .shape import *
 from .sprite import *
 from .text import *

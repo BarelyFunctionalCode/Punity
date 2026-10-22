@@ -1,22 +1,23 @@
-import tkinter as tk
 import time
 import numpy as np
+from PySide6.QtCore import QRect, QObject
 
 from engine import Environment
 from engine.component import Component
 from engine.transform import Transform
 from engine.math import Vector2
-from engine.graphics import TkRoot, TkWindow
+from engine.graphics import QTWindow
 
 
-class Object(Component):
+class Object(Component, QObject):
   def __init__(self, parent=None, name="root", width=0, height=0, x=0, y=0, is_static=True, **kwargs):
     # Setting the parent and children
     self._is_first_frame = True
     self.parent = parent
     self.children = np.array([])
     self.name = f"{name.lower()}_{id(self)}"
-    self.tk_obj = None
+    self.qt_obj = None
+    self.graphics = np.array([])
 
     # Object speficic variables for movement and collision
     self.transform = None
@@ -26,29 +27,24 @@ class Object(Component):
     self.paused = Environment.paused
     self.last_update_time = time.time()
 
-    if parent == None and Environment.root != None: return
+    # if parent == None and Environment.root != None: return
 
-    # Setting default TK Window Options
-    embed = kwargs.get('embed', False)
-    container = kwargs.get('container', False)
-    self.tk_obj = TkWindow(parent.tk_obj, embed, container) if parent != None else TkRoot()
-    self.tk_obj.title(f"punity_{self.name}")
-    self.tk_obj.geometry(f"{width}x{height}+{x}+{y}")
-    self.tk_obj.update_idletasks()
+    self.qt_obj = QTWindow(self) if Environment.root == None else Environment.root.qt_obj
 
     # Setting the transform component
-    self.transform = Transform(self)
+    parent_position = Vector2([0, 0])
+    if parent is not None and parent.transform is not None:
+      parent_position = parent.transform.position
+    self.transform = Transform(self, x + parent_position.x, y + parent_position.y, width, height)
 
     self.is_faded = False
     self._is_fading = False
     self.fade_step = 0.05
-    self.fade_step_delay = 50
+    self.fade_step_delay = 100
     self._fade_step_timer = 0
 
-    self.images = {}
-
     # Init other sibling class instances
-    super().__init__(**kwargs)
+    super().__init__(parent=parent if parent is not None else self.qt_obj, objectName=self.name, **kwargs)
 
     # Adding object to Environment
     Environment.objects = np.append(Environment.objects, self)
@@ -59,22 +55,7 @@ class Object(Component):
 
     # Run start function, and start the update loop
     self.start()
-
-  @property
-  def _x(self):
-    return self.tk_obj.winfo_x()
-
-  @property
-  def _y(self):
-    return self.tk_obj.winfo_y()
-
-  @property
-  def _width(self):
-    return self.tk_obj.winfo_width()
-
-  @property
-  def _height(self):
-    return self.tk_obj.winfo_height()
+    self.update_visuals()
 
   # Time between the last update and the current update
   @property
@@ -85,31 +66,36 @@ class Object(Component):
   def _update(self, parent_delta_movement = Vector2([0, 0])):
     if self._is_first_frame: parent_delta_movement = Vector2([0, 0])
     if not self.paused:
-      if self.tk_obj == None: return
+      if self.qt_obj == None: return
       # Fading logic
       if self._is_fading and self._fade_step_timer < self.fade_step_delay:
         self._fade_step_timer += self.delta_time
         if self.is_faded:
-          if self.tk_obj.wm_attributes("-alpha") < 1.0:
-            self.tk_obj.wm_attributes("-alpha", self.tk_obj.wm_attributes("-alpha") + self.fade_step)
-            self._fade_step_timer = 0
-          else:
+          done = True
+          for graphic in self.graphics:
+            if graphic.opacity < 1.0:
+              graphic.opacity += self.fade_step
+              self._fade_step_timer = 0
+              done = False
+          if done:
             self.is_faded = False
             self._is_fading = False
         else:
-          if self.tk_obj.wm_attributes("-alpha") > 0.0:
-            self.tk_obj.wm_attributes("-alpha", self.tk_obj.wm_attributes("-alpha") - self.fade_step)
-            self._fade_step_timer = 0
-          else:
+          done = True
+          for graphic in self.graphics:
+            if graphic.opacity > 0.0:
+              graphic.opacity -= self.fade_step
+              self._fade_step_timer = 0
+              done = False
+          if done:
             self.is_faded = True
             self._is_fading = False
 
       # Run update functionality for derived class and sibling classes
-      self.transform.position = self.transform.position + parent_delta_movement
-      self.transform.did_move_this_frame = False
-      old_position = self.transform.position
+      if parent_delta_movement.magnitude > 0:
+        self.transform._position = self.transform._position + parent_delta_movement
       self.update()
-      if self.tk_obj == None: return
+      if self.qt_obj == None: return
 
       delta_movement = Vector2([0, 0])
 
@@ -124,19 +110,16 @@ class Object(Component):
             # if not obj.is_static:
             #   obj.on_collision(-col_normal, self)
 
-        # Update the position of the TK Window
-        if self.transform.did_move_this_frame:
-          self.transform.did_move_this_frame = False
-          delta_movement = self.transform.position - old_position
+      # Update the position
+      delta_movement = self.transform._resolve_position_update()
 
       # Update the position of the children
       if len(self.children) > 0:
         for child in self.children:
           child._update(parent_delta_movement + delta_movement)
 
-      new_position = self.transform.position.astype(Vector2.int)
-      self.tk_obj.update_idletasks()
-      self.tk_obj.geometry(f"{self.transform.width}x{self.transform.height}+{new_position.x}+{new_position.y}")
+      self.post_update(did_geomentry_update=(parent_delta_movement + delta_movement).magnitude > 0)
+
     self.last_update_time = time.time()
     if self._is_first_frame: self._is_first_frame = False
 
@@ -147,13 +130,42 @@ class Object(Component):
   def update(self):
     super().update()
 
-  # Destroys TK Window and removes object from Environment
+  def post_update(self, did_geomentry_update):
+      super().post_update(did_geomentry_update)
+
+  def update_visuals(self):
+    if self.qt_obj is not None:
+      self.qt_obj.update()
+
+  def paint(self, p):
+    for graphic in self.graphics:
+      graphic.paint(p)
+
+    for child in self.children:
+      child.paint(p)
+
+  def set_inputs(self, enabled):
+    if self.qt_obj is not None:
+      self.qt_obj.set_inputs(enabled)
+
   def destroy(self):
-    self.tk_obj.destroy()
-    self.tk_obj = None
     if self.parent:
       self.parent.children = np.delete(self.parent.children, np.where(self.parent.children == self))
     Environment.objects = np.delete(Environment.objects, np.where(Environment.objects == self))
+    self.update_visuals()
+
+  def _mouse_event(self, event):
+    # Iterate children in reverse order to handle top-most first
+    for target in reversed(self.children):
+      done = target._mouse_event(event)
+      if done:
+        return True
+    else:
+      # Starting at the top-most leaf objects, try to process mouse event
+      if hasattr(self, "mouse_event") and QRect(*self.transform.rect).contains(event.position().toPoint()):
+        self.mouse_event(event)
+        return True
+    return False
 
   # Fade in/out the object
   def fade_in(self):

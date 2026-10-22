@@ -1,6 +1,11 @@
 import time
 import numpy as np
-import pyautogui
+from PySide6.QtGui import QScreen
+from PySide6.QtWidgets import QApplication
+
+from PySide6.QtCore import QTimer
+
+from pynput import keyboard
 
 from engine.math import Vector2
 from engine.event import Event
@@ -11,13 +16,14 @@ from .system import add_input_event_monitor
 
 class Environment:
   def __init__(self):
-    size = pyautogui.size()
 
     self.dev_mode = False
     self.x = 0
-    self.y = 25
-    self.width = size.width
-    self.height = size.height-25 # TODO: Find a better way to offset the taskbar
+    self.y = 0
+    self.x_offset = 0
+    self.y_offset = 0
+    self.width = 0
+    self.height = 0
     self.paused = False
     self.objects = np.array([])
     self.root = None
@@ -39,6 +45,21 @@ class Environment:
     self.keyboard_current_log_window = -1
     self.keyboard_log_history = []
 
+    self.global_hotkey_activated = Event()
+
+    def for_canonical(f):
+      return lambda k: f(listener.canonical(k))
+
+    hotkey = keyboard.HotKey(keyboard.HotKey.parse('<cmd_l>+`'), self.global_hotkey_activated.invoke)
+    listener = keyboard.Listener(on_press=for_canonical(hotkey.press), on_release=for_canonical(hotkey.release))
+    listener.start()
+
+  def update_screen(self):
+    rect = QScreen.availableGeometry(QApplication.primaryScreen())
+    self.width = rect.width()
+    self.height = rect.height()
+    self.x_offset = rect.x()
+    self.y_offset = rect.y()
 
   def update(self):
     update_applications(self.applications, self.new_application_event)
@@ -56,11 +77,18 @@ class Environment:
       self.inactivity_timer = -1
     elif self.inactivity_timer != -1:
       self.inactivity_timer += 100
-    self.root.tk_obj.after(100, self.update)
 
   def set_root(self, root):
     self.root = root
-    self.update()
+    # self._timer = QTimer()
+    # self._timer.timeout.connect(self.update)
+    # self._timer.start(100)
+
+  def add_global_hotkey_listener(self, listener):
+    self.global_hotkey_activated.add_listener(listener)
+
+  def remove_global_hotkey_listener(self, listener):
+    self.global_hotkey_activated.remove_listener(listener)
 
   def start_input_event_monitor(self):
     add_input_event_monitor(self, self.new_input_event)
