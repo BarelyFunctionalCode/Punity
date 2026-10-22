@@ -33,6 +33,8 @@ class InputBox(Object):
     self.text_edit = QTextEdit(self.parent.qt_obj)
     self.text_edit.setAttribute(Qt.WA_TranslucentBackground)
     self.text_edit.setStyleSheet(f"background: transparent; color: {self.color};")
+    self.text_edit.setAutoFormatting(QTextEdit.AutoBulletList)
+    self.text_edit.setAcceptRichText(False)
     self.text_edit.show()
     self.text_edit.setGeometry(position.x, position.y, self.transform.width, self.transform.height)
     self.text_edit.setFocus()

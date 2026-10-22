@@ -1,10 +1,10 @@
 import time
 import threading
 
-from engine.event import Event
-from engine.scene import Scene
+from Punity import Scene
+from Punity.engine.event import Event
 
-from assets.objects.frame import Frame
+from Punity.assets.objects.frame import Frame
 
 class Brain:
   def __init__(self):

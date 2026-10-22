@@ -79,14 +79,14 @@ https://doc.qt.io/qtforpython-6/PySide6/QtGui/QStyleHints.html#PySide6.QtGui.QSt
 - [x] engine/graphics/main.py
 - [x] engine/graphics/text.py
 - [] engine/graphics/sprite.py
-- [] engine/graphics/shape.py
+- [x] engine/graphics/shape.py
 - [] engine/graphics/threedee/main.py
 - [x] assets/effects/hole_punch.py (Abstract TK usage to object)
 - [] assets/objects/terminal.py (Abstract TK usage to object)
 - [x] assets/objects/screen_chunk.py
 - [x] assets/objects/modal.py (Abstract TK usage to object)
 - [x] assets/objects/hole.py (Abstract TK usage to object)
-- [] assets/objects/fren/actions/hole_punch_entrance.py (Abstract TK usage to object)
+- [x] assets/objects/fren/actions/hole_punch_entrance.py (Abstract TK usage to object)
 - [x] assets/objects/toast/main.py
 
 

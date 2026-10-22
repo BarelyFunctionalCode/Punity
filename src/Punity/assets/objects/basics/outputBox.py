@@ -1,4 +1,5 @@
 import re
+from turtle import color
 from PySide6.QtWidgets import QTextEdit
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QColor
@@ -47,19 +48,18 @@ class OutputBox(Object):
     if self.text_edit is not None and value != self._text:
       # self.text_edit.setPlainText(value)
       # text is in form "some text <!{COLOR}!>some text some text <!{COLOR}!>some text some text <!{COLOR}!>some text"
-      parts = re.split(r"<!(.*?)!>", value)
-      offset = 0
+      parts = re.split(r"(<!.*?!>)", value)
       self.text_edit.clear()
-      if value[0:2] == "<!":
-        self.text_edit.setTextColor(QColor(parts[0]))
-        offset = 1
-      for i in range(offset, len(parts), 2):
-        text = parts[i]
-        color = parts[i + 1] if i + 1 < len(parts) else self.fill
-        print(f"Inserting text: '{text}' with color: '{color}'")
-        cursor = self.text_edit.textCursor()
-        cursor.insertText(text)
-        self.text_edit.setTextColor(QColor(color))
+      self.text_edit.setTextBackgroundColor(QColor(0,0,0,0))
+      for p in parts:
+        if p[0:2] == "<!":
+            match = re.match(r"<!(.*?)!>", p)
+            if match != None:
+              self.text_edit.setTextBackgroundColor(QColor(match.group(1)))
+        else:
+          cursor = self.text_edit.textCursor()
+          cursor.insertText(p)
+      self.text_edit.setTextBackgroundColor(QColor(0,0,0,0))
       self._text = value
 
   @font_size.setter

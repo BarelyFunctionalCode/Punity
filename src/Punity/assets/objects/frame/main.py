@@ -68,13 +68,13 @@ class Frame(Object):
       "submitted": {
         "x": 100,
         "y": 100,
-        "container_color": "#ff6f91",
-        "container_opacity": 0.5,
-        "container_rect": [0, 0, 300, 80],
+        "container_color": "#d65db1",
+        "container_opacity": 0.8,
+        "container_rect": [0, 0, 600, 300],
         "container_hole_rect": [-10, 0, 0, 0],
         "content_rect": [0, 10, 0, 0],
         "content_opacity": 0.0,
-        "text_rect": [10, 10, 280, 60],
+        "text_rect": [10, 10, 580, 280],
         "text_opacity": 1.0,
         "text_color": "white",
         "text_size": 14,
@@ -117,9 +117,9 @@ class Frame(Object):
       self,
       x=open_content_rect[0] + 10,
       y=open_content_rect[1] + 10,
-      width=open_content_rect[2] - 20,
-      height=open_content_rect[3] - 20,
-      color="#f9f871"
+      width=open_content_rect[2] - 100,
+      height=open_content_rect[3] - 60,
+      color="white"
     )
 
     self.output_box = OutputBox(
